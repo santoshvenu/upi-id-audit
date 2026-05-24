@@ -101,8 +101,9 @@ If you've found a UPI handle pattern that's missing, or cleanup steps that have 
 | Version | What changed |
 |---|---|
 | v1.1.1 | Removed idle scoring — risk now based on phone/bank status only |
-| v1.1.0 | Added Action Plan step (Step 4) — priority queue, app batching, time estimates |
-| v1.0.0 | Initial public release — consent gate, 5-step flow, PDF export, share link, security hardening |
+| v1.1.0 | Added Action Plan step — priority queue, app batching, time estimates |
+| v1.0.1 | Mobile responsive fix — block layout, viewport meta, OG tags for social sharing |
+| v1.0.0 | Initial public release — consent gate, 5-step flow, PDF export, share link, security hardening, about panel, footer |
 
 ---
 
