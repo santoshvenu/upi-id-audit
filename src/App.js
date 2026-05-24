@@ -996,8 +996,19 @@ export default function App() {
           {step === 3 && <Step3Cleanup vpas={vpas} sims={sims} done={done} setDone={setDone} onBack={()=>setStep(2)} />}
         </div>
 
-        <div style={{ textAlign:"center", marginTop:14, fontSize:11, color:"#334155" }}>
-          No data transmitted · Mobile numbers cleared on tab close · v0.5
+        <div style={{ marginTop:16, padding:"16px 20px", background:"#1e293b", border:"1px solid #334155", borderRadius:12, display:"flex", flexDirection:"column", gap:6 }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:8 }}>
+            <div style={{ fontSize:12, color:"#475569" }}>
+              Built by <strong style={{ color:"#94a3b8" }}>Santosh Krishna Venuturupalli</strong> · <a href="https://www.linkedin.com/in/santoshkrishna" target="_blank" rel="noopener noreferrer" style={{ color:"#38bdf8", textDecoration:"none" }}>LinkedIn</a>
+            </div>
+            <div style={{ fontSize:11, color:"#334155" }}>v1.0</div>
+          </div>
+          <div style={{ fontSize:12, color:"#475569", fontStyle:"italic", lineHeight:1.6 }}>
+            Inspired by <a href="https://economictimes.indiatimes.com/wealth/save/how-your-old-forgotten-upi-ids-may-become-a-security-risk-and-how-to-protectyourself/articleshow/131195220.cms" target="_blank" rel="noopener noreferrer" style={{ color:"#38bdf8", textDecoration:"none", borderBottom:"1px solid #38bdf833" }}>this ET article</a> · Built in one evening · Shipped because it needed to exist.
+          </div>
+          <div style={{ fontSize:11, color:"#334155" }}>
+            No data transmitted · No analytics · Not affiliated with NPCI or any bank
+          </div>
         </div>
       </div>
     </div>
@@ -1080,10 +1091,8 @@ function AboutPanel() {
             UPI IDs shown are generated based on standard handle patterns and may not match your exact account state. Always cross-check by dialling <strong style={{ color:"#e2e8f0" }}>*99#</strong> from your SIM — NPCI's own service — before taking any action. This tool is not affiliated with NPCI, UPI, or any bank or payment service provider. It is a free public utility, built for Indian UPI users.
           </Section>
 
-          <div style={{ borderTop:"1px solid #334155", paddingTop:14, fontSize:12, color:"#475569", lineHeight:1.7 }}>
-            Built by <strong style={{ color:"#94a3b8" }}>Santosh Krishna Venuturupalli</strong> · <a href="https://santoshkrishna.in" target="_blank" rel="noopener noreferrer" className="about-link">santoshkrishna.in</a>
-            <br />
-            Inspired by the ET article · Built in one evening · Shipped because it needed to exist.
+          <div style={{ borderTop:"1px solid #334155", paddingTop:14, fontSize:12, color:"#475569", lineHeight:1.9 }}>
+            Inspired by <a href="https://economictimes.indiatimes.com/wealth/save/how-your-old-forgotten-upi-ids-may-become-a-security-risk-and-how-to-protectyourself/articleshow/131195220.cms" target="_blank" rel="noopener noreferrer" style={{ color:"#38bdf8", textDecoration:"none", borderBottom:"1px solid #38bdf833" }}>this ET article</a> · Built in one evening · Shipped because it needed to exist.
           </div>
 
         </div>
