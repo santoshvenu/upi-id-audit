@@ -436,7 +436,7 @@ function StatCard({ value, label, color }) {
   );
 }
 
-const STEPS = ["Setup","VPAs","Risk","Clean Up"];
+const STEPS = ["Setup","VPAs","Risk","Action Plan","Cleanup"];
 function StepIndicator({ current }) {
   return (
     <div style={{ display:"flex", alignItems:"center", marginBottom:24 }}>
@@ -699,43 +699,201 @@ function Step1VPAs({ sims, vpas, onNext, onBack }) {
 function Step2Risk({ vpas, onNext, onBack }) {
   const sorted = [...vpas].sort((a,b)=>b.risk.score-a.risk.score);
   const byLevel = { HIGH: sorted.filter(v=>v.risk.level==="HIGH"), MEDIUM: sorted.filter(v=>v.risk.level==="MEDIUM"), LOW: sorted.filter(v=>v.risk.level==="LOW") };
-  const meta = { HIGH:{color:"#FF4444",label:"HIGH RISK — Act immediately"}, MEDIUM:{color:"#FF9F1C",label:"MEDIUM RISK — Review soon"}, LOW:{color:"#2EC4B6",label:"LOW RISK — Monitor"} };
+  const meta = { HIGH:{color:"#ef4444",label:"HIGH — Investigate promptly"}, MEDIUM:{color:"#f59e0b",label:"MEDIUM — Review soon"}, LOW:{color:"#22c55e",label:"LOW — Monitor"} };
   return (
     <div>
       <h2 style={{ fontSize:22, fontWeight:700, color:"#f1f5f9", marginBottom:6 }}>Risk breakdown</h2>
-      <p style={{ color:"#94a3b8", fontSize:14, marginBottom:16, lineHeight:1.6 }}>Address HIGH risk items first. Score combines idle time, phone status, and bank account status.</p>
+      <p style={{ color:"#94a3b8", fontSize:14, marginBottom:16, lineHeight:1.6 }}>
+        Based on what you told us — idle time, phone status, and bank account status.
+      </p>
+
+      {/* Risk score explainer */}
+      <div style={{ background:"#1a1f2e", border:"1px solid #334155", borderRadius:10, padding:"14px 16px", marginBottom:20 }}>
+        <div style={{ fontSize:12, fontWeight:600, color:"#94a3b8", marginBottom:6 }}>💡 What does this score mean?</div>
+        <div style={{ fontSize:13, color:"#64748b", lineHeight:1.7 }}>
+          The risk score is based entirely on the information <strong style={{ color:"#94a3b8" }}>you provided</strong> — it does not connect to any bank, NPCI, or UPI system, and cannot verify whether any ID is actually active or has been misused.
+          <br /><br />
+          Think of it as a <strong style={{ color:"#94a3b8" }}>situational risk signal</strong> — like a doctor asking about your lifestyle before running tests. A HIGH score means the situation warrants investigation, not that something has definitely gone wrong. Always verify via <strong style={{ color:"#94a3b8", fontFamily:"monospace" }}>*99#</strong> before taking action.
+        </div>
+        <div style={{ marginTop:12, display:"flex", flexWrap:"wrap", gap:8 }}>
+          {[
+            { label:"Years idle", pts:"up to 35 pts" },
+            { label:"Phone number changed", pts:"40 pts" },
+            { label:"Phone inactive", pts:"30 pts" },
+            { label:"Bank account closed", pts:"30 pts" },
+            { label:"Account dormant", pts:"20 pts" },
+          ].map((f,i) => (
+            <div key={i} style={{ fontSize:11, color:"#475569", background:"#0f172a", border:"1px solid #1e293b", borderRadius:6, padding:"3px 9px" }}>
+              {f.label} <span style={{ color:"#334155" }}>· {f.pts}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {Object.entries(byLevel).filter(([,vs])=>vs.length>0).map(([level,vs]) => (
         <div key={level} style={{ marginBottom:16 }}>
-          <div style={{ fontSize:8, fontWeight:800, color:meta[level].color, letterSpacing:1.2, marginBottom:6, textTransform:"uppercase" }}>{meta[level].label} ({vs.length})</div>
+          <div style={{ fontSize:11, fontWeight:700, color:meta[level].color, letterSpacing:0.8, marginBottom:8, textTransform:"uppercase" }}>{meta[level].label} ({vs.length})</div>
           {vs.map((v,i) => (
-            <div key={i} style={{ background:"#0a0a10", border:`1px solid ${v.risk.color}20`, borderRadius:9, padding:"10px 11px", marginBottom:6 }}>
+            <div key={i} style={{ background:"#0f172a", border:`1px solid ${v.risk.color}22`, borderRadius:9, padding:"11px 13px", marginBottom:6 }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:5 }}>
                 <div>
-                  <div style={{ fontFamily:"monospace", fontSize:11, color:"#ccc" }}>{v.vpa}</div>
-                  <div style={{ fontSize:8, color:"#444", marginTop:2 }}>{v.appName} · {v.simLabel}</div>
+                  <div style={{ fontFamily:"monospace", fontSize:12, color:"#e2e8f0" }}>{v.vpa}</div>
+                  <div style={{ fontSize:11, color:"#475569", marginTop:2 }}>{v.appName} · {v.simLabel}</div>
                 </div>
                 <RiskBadge level={v.risk.level} color={v.risk.color} score={v.risk.score} />
               </div>
               <div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>
-                {v.risk.flags.map((f,j)=><span key={j} style={{ fontSize:8, padding:"2px 6px", borderRadius:4, background:"#141414", color:"#555", border:"1px solid #202020" }}>⚠ {f}</span>)}
+                {v.risk.flags.map((f,j)=><span key={j} style={{ fontSize:11, padding:"2px 8px", borderRadius:4, background:"#1e293b", color:"#64748b", border:"1px solid #334155" }}>⚠ {f}</span>)}
               </div>
             </div>
           ))}
         </div>
       ))}
       <div style={{ display:"flex", gap:8 }}>
-        <button onClick={onBack} style={{ ...bs, flex:"0 0 70px" }}>← Back</button>
-        <button onClick={onNext} style={bp}>Start Cleanup →</button>
+        <button onClick={onBack} style={{ ...bs, flex:"0 0 80px" }}>← Back</button>
+        <button onClick={onNext} style={bp}>See My Action Plan →</button>
       </div>
     </div>
   );
 }
 
 // ─────────────────────────────────────────────
-// STEP 3 — CLEANUP
+// STEP 3 — ACTION PLAN
 // ─────────────────────────────────────────────
 
-function Step3Cleanup({ vpas, sims, done, setDone, onBack }) {
+function Step3ActionPlan({ vpas, onNext, onBack }) {
+  const high   = vpas.filter(v => v.risk.level === "HIGH");
+  const medium = vpas.filter(v => v.risk.level === "MEDIUM");
+  const low    = vpas.filter(v => v.risk.level === "LOW");
+
+  // Group by app for batching advice
+  const byApp = vpas.reduce((acc, v) => {
+    if (v.risk.level === "LOW") return acc;
+    const key = v.appName;
+    if (!acc[key]) acc[key] = { name: key, color: v.color, high: 0, medium: 0 };
+    if (v.risk.level === "HIGH") acc[key].high++;
+    else acc[key].medium++;
+    return acc;
+  }, {});
+
+  const appGroups = Object.values(byApp)
+    .filter(a => a.high + a.medium > 0)
+    .sort((a, b) => (b.high - a.high) || (b.medium - a.medium));
+
+  // Estimate: ~3 min per HIGH item, ~2 min per MEDIUM
+  const estMins = high.length * 3 + medium.length * 2;
+
+  const urgencyLabel = high.length > 0
+    ? `${high.length} item${high.length > 1 ? "s" : ""} need attention this week`
+    : medium.length > 0
+    ? `${medium.length} item${medium.length > 1 ? "s" : ""} to review this month`
+    : "Nothing urgent — you're in good shape";
+
+  const PriorityItem = ({ v, tier }) => (
+    <div style={{ display:"flex", alignItems:"flex-start", gap:12, padding:"11px 14px", background:"#0f172a", border:`1px solid ${v.risk.color}22`, borderLeft:`3px solid ${v.risk.color}`, borderRadius:8, marginBottom:8 }}>
+      <div style={{ flex:1 }}>
+        <div style={{ fontFamily:"monospace", fontSize:12, color:"#e2e8f0", fontWeight:600, marginBottom:3 }}>{v.vpa}</div>
+        <div style={{ fontSize:11, color:"#64748b" }}>{v.appName} · {v.simLabel}</div>
+        {v.risk.flags.length > 0 && (
+          <div style={{ fontSize:11, color: tier === "HIGH" ? "#fca5a5" : "#fcd34d", marginTop:4 }}>
+            ⚠ {v.risk.flags[0]}
+          </div>
+        )}
+      </div>
+      <div style={{ fontSize:10, color:"#475569", textAlign:"right", flexShrink:0 }}>
+        ~{tier === "HIGH" ? 3 : 2} min
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <h2 style={{ fontSize:22, fontWeight:700, color:"#f1f5f9", marginBottom:4 }}>Your action plan</h2>
+      <p style={{ color:"#94a3b8", fontSize:14, marginBottom:20, lineHeight:1.6 }}>
+        {urgencyLabel}
+        {estMins > 0 && <span style={{ color:"#64748b" }}> · ~{estMins} min total</span>}
+      </p>
+
+      {/* Before you start */}
+      <div style={{ background:"#0c1a2e", border:"1px solid #1e3a5f", borderRadius:10, padding:"13px 16px", marginBottom:20 }}>
+        <div style={{ fontSize:12, fontWeight:600, color:"#38bdf8", marginBottom:8 }}>⚡ Before you start</div>
+        <div style={{ fontSize:13, color:"#64748b", lineHeight:1.7 }}>
+          Dial <strong style={{ color:"#e2e8f0", fontFamily:"monospace" }}>*99#</strong> from each SIM to verify these IDs actually exist before deleting. Takes 2 minutes per SIM. Works without internet on any phone.
+        </div>
+      </div>
+
+      {/* HIGH risk */}
+      {high.length > 0 && (
+        <div style={{ marginBottom:20 }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#ef4444", letterSpacing:0.8, textTransform:"uppercase", marginBottom:10 }}>
+            🔴 Do this week — High risk ({high.length})
+          </div>
+          {high.sort((a,b) => b.risk.score - a.risk.score).map((v,i) => <PriorityItem key={i} v={v} tier="HIGH" />)}
+        </div>
+      )}
+
+      {/* MEDIUM risk */}
+      {medium.length > 0 && (
+        <div style={{ marginBottom:20 }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#f59e0b", letterSpacing:0.8, textTransform:"uppercase", marginBottom:10 }}>
+            🟡 Do this month — Medium risk ({medium.length})
+          </div>
+          {medium.sort((a,b) => b.risk.score - a.risk.score).map((v,i) => <PriorityItem key={i} v={v} tier="MEDIUM" />)}
+        </div>
+      )}
+
+      {/* LOW risk */}
+      {low.length > 0 && (
+        <div style={{ background:"#0f172a", border:"1px solid #1e293b", borderRadius:10, padding:"12px 16px", marginBottom:20 }}>
+          <div style={{ fontSize:12, color:"#22c55e", fontWeight:600, marginBottom:3 }}>
+            ✓ {low.length} low risk ID{low.length > 1 ? "s" : ""} — no action needed now
+          </div>
+          <div style={{ fontSize:12, color:"#475569" }}>Monitor these at your 6-month re-audit.</div>
+        </div>
+      )}
+
+      {/* Batch by app */}
+      {appGroups.length > 0 && (
+        <div style={{ marginBottom:20 }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#94a3b8", letterSpacing:0.8, textTransform:"uppercase", marginBottom:10 }}>
+            📱 Batch by app — open each app once
+          </div>
+          {appGroups.map((a, i) => (
+            <div key={i} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 14px", background:"#0f172a", border:"1px solid #1e293b", borderLeft:`3px solid ${a.color}`, borderRadius:8, marginBottom:6 }}>
+              <span style={{ fontSize:13, color:"#e2e8f0", fontWeight:500 }}>{a.name}</span>
+              <div style={{ display:"flex", gap:8 }}>
+                {a.high > 0 && <span style={{ fontSize:11, color:"#fca5a5", background:"#7f1d1d22", padding:"2px 8px", borderRadius:10 }}>{a.high} high</span>}
+                {a.medium > 0 && <span style={{ fontSize:11, color:"#fcd34d", background:"#78350f22", padding:"2px 8px", borderRadius:10 }}>{a.medium} medium</span>}
+              </div>
+            </div>
+          ))}
+          <div style={{ fontSize:11, color:"#475569", marginTop:8, lineHeight:1.6 }}>
+            Open each app once and handle all its items in one go — much faster than going app by app per ID.
+          </div>
+        </div>
+      )}
+
+      {/* Nothing to do */}
+      {high.length === 0 && medium.length === 0 && (
+        <div style={{ background:"#0c2a1a", border:"1px solid #166534", borderRadius:10, padding:"16px", marginBottom:20, textAlign:"center" }}>
+          <div style={{ fontSize:20, marginBottom:6 }}>✓</div>
+          <div style={{ fontSize:14, color:"#4ade80", fontWeight:600 }}>You're in good shape</div>
+          <div style={{ fontSize:12, color:"#475569", marginTop:4 }}>No high or medium risk IDs found. Re-audit every 6 months.</div>
+        </div>
+      )}
+
+      <div style={{ display:"flex", gap:8 }}>
+        <button onClick={onBack} style={{ ...bs, flex:"0 0 80px" }}>← Back</button>
+        <button onClick={onNext} style={bp}>Go to cleanup checklist →</button>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// STEP 4 — CLEANUP
+
+function Step4Cleanup({ vpas, sims, done, setDone, onBack }) {
   const [expanded,   setExpanded]   = useState(null);
   const [showUSSD,   setShowUSSD]   = useState(false);
   const [reminderOK, setReminderOK] = useState(false);
@@ -880,6 +1038,92 @@ function RestoreBanner({ mobilesPresent, onDismiss, onClear }) {
           <button onClick={onDismiss} style={{ padding:"3px 8px", borderRadius:5, fontSize:9, fontWeight:700, border:"none", background:"#2EC4B620", color:"#2EC4B6", cursor:"pointer" }}>OK</button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// ABOUT PANEL
+// ─────────────────────────────────────────────
+
+function AboutPanel() {
+  const [open, setOpen] = useState(false);
+
+  const Section = ({ icon, title, children }) => (
+    <div style={{ marginBottom:20 }}>
+      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
+        <span style={{ fontSize:16 }}>{icon}</span>
+        <span style={{ fontSize:13, fontWeight:600, color:"#f1f5f9" }}>{title}</span>
+      </div>
+      <div style={{ fontSize:13, color:"#94a3b8", lineHeight:1.75, paddingLeft:24 }}>{children}</div>
+    </div>
+  );
+
+  return (
+    <div style={{ marginTop:0, marginBottom:20 }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{ width:"100%", padding:"13px 18px", borderRadius: open ? "12px 12px 0 0" : 12, cursor:"pointer", background:"#1e293b", border:"1px solid #334155", display:"flex", justifyContent:"space-between", alignItems:"center" }}
+      >
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <span style={{ fontSize:14 }}>ℹ️</span>
+          <span style={{ fontSize:13, fontWeight:600, color:"#94a3b8" }}>What is this? Why should I use it? Is it safe?</span>
+        </div>
+        <span style={{ color:"#475569", fontSize:12, fontWeight:600 }}>{open ? "▲ Close" : "▼ Read"}</span>
+      </button>
+
+      {open && (
+        <div style={{ background:"#1e293b", border:"1px solid #334155", borderTop:"none", borderRadius:"0 0 12px 12px", padding:"22px 20px" }}>
+
+          <Section icon="💡" title="How this started">
+            This tool was born from a short article in The Economic Times — <a href="https://economictimes.indiatimes.com/wealth/save/how-your-old-forgotten-upi-ids-may-become-a-security-risk-and-how-to-protectyourself/articleshow/131195220.cms" target="_blank" rel="noopener noreferrer" style={{ color:"#38bdf8", textDecoration:"none" }}>How your old forgotten UPI IDs may become a security risk</a>. The article explained the risk clearly but offered no easy solution — no tool existed to find all your UPI IDs in one place and walk you through cleaning them up. So we built one. Same evening. Over a glass of wine.
+          </Section>
+
+          <Section icon="❓" title="Why should you care?">
+            Every UPI app you've ever installed — GPay, PhonePe, Paytm, Amazon Pay, CRED — quietly created several UPI IDs the moment you signed up. They don't disappear when you uninstall the app. They don't close when you change your phone number. They don't deactivate when you close a bank account.
+            <br /><br />
+            Most people have 15–40 active UPI IDs they've never seen. If you've ever changed your mobile number, that old number may have been reassigned to someone else by your telecom operator. Your UPI IDs still point to your bank. This is a real, underreported risk.
+          </Section>
+
+          <Section icon="🔧" title="What this tool does">
+            It generates every UPI ID likely created for your mobile numbers across all major apps and banks — based on the standard handle patterns NPCI mandates. It scores each one for risk based on how long it's been idle, your phone number status, and whether the linked bank account is still active. Then it gives you step-by-step instructions to delete the risky ones, app by app. No guessing. No Googling.
+          </Section>
+
+          <Section icon="🔒" title="Your data — exactly what happens to it">
+            <strong style={{ color:"#e2e8f0" }}>Your mobile number never leaves your device.</strong> Full stop. Here is exactly what happens technically:
+            <br /><br />
+            • Your number is held in browser memory (React state) only<br />
+            • It is written to sessionStorage — which clears automatically when you close the tab<br />
+            • It is <strong style={{ color:"#e2e8f0" }}>never</strong> written to localStorage<br />
+            • It is <strong style={{ color:"#e2e8f0" }}>never</strong> sent to any server, API, or backend — because there is none<br />
+            • The share link contains zero personal data — only your app selections<br />
+            • The PDF export masks your number to last 4 digits only<br />
+            <br />
+            Open your browser's DevTools → Network tab while using this tool. You will see zero outgoing requests. That is the proof, not just a promise.
+          </Section>
+
+          <div style={{ background:"#0c1a2e", border:"1px solid #1e3a5f", borderRadius:10, padding:"14px 16px", marginBottom:20 }}>
+            <div style={{ display:"flex", alignItems:"flex-start", gap:10 }}>
+              <span style={{ fontSize:18, flexShrink:0 }}>📊</span>
+              <div>
+                <div style={{ fontSize:13, fontWeight:600, color:"#38bdf8", marginBottom:5 }}>No analytics. Zero. And that's deliberate.</div>
+                <div style={{ fontSize:13, color:"#64748b", lineHeight:1.7 }}>
+                  We know — for a digital analytics professional to ship a tool with no analytics is almost ironic. But for something that touches financial identity, privacy beats insight. There is no Adobe Analytics, no Google Analytics, no Mixpanel, no tracking pixel, no heatmap, no session recording, no event logging. Nothing. If you use this tool, we have no idea. And that's exactly how it should be.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <Section icon="⚠️" title="Important disclaimer">
+            UPI IDs shown are generated based on standard handle patterns and may not match your exact account state. Always cross-check by dialling <strong style={{ color:"#e2e8f0" }}>*99#</strong> from your SIM — NPCI's own service — before taking any action. This tool is not affiliated with NPCI, UPI, or any bank or payment service provider. It is a free public utility, built for Indian UPI users.
+          </Section>
+
+          <div style={{ borderTop:"1px solid #334155", paddingTop:14, fontSize:12, color:"#475569", lineHeight:1.9 }}>
+            Inspired by <a href="https://economictimes.indiatimes.com/wealth/save/how-your-old-forgotten-upi-ids-may-become-a-security-risk-and-how-to-protectyourself/articleshow/131195220.cms" target="_blank" rel="noopener noreferrer" style={{ color:"#38bdf8", textDecoration:"none", borderBottom:"1px solid #38bdf833" }}>this ET article</a> · Built in one evening · Shipped because it needed to exist.
+          </div>
+
+        </div>
+      )}
     </div>
   );
 }
@@ -1081,7 +1325,8 @@ export default function App() {
           {step === 0 && <Step0Setup onNext={handleSetup} initialSims={sims} />}
           {step === 1 && <Step1VPAs sims={sims} vpas={vpas} onNext={()=>setStep(2)} onBack={()=>setStep(0)} />}
           {step === 2 && <Step2Risk vpas={vpas} onNext={()=>setStep(3)} onBack={()=>setStep(1)} />}
-          {step === 3 && <Step3Cleanup vpas={vpas} sims={sims} done={done} setDone={setDone} onBack={()=>setStep(2)} />}
+          {step === 3 && <Step3ActionPlan vpas={vpas} onNext={()=>setStep(4)} onBack={()=>setStep(2)} />}
+          {step === 4 && <Step4Cleanup vpas={vpas} sims={sims} done={done} setDone={setDone} onBack={()=>setStep(3)} />}
         </div>
 
         <div style={{ marginTop:16, padding:"16px 20px", background:"#1e293b", border:"1px solid #334155", borderRadius:12, display:"flex", flexDirection:"column", gap:6 }}>
@@ -1099,92 +1344,6 @@ export default function App() {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// ABOUT PANEL
-// ─────────────────────────────────────────────
-
-function AboutPanel() {
-  const [open, setOpen] = useState(false); // collapsed by default — CTA stays above the fold
-
-  const Section = ({ icon, title, children }) => (
-    <div style={{ marginBottom:20 }}>
-      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
-        <span style={{ fontSize:16 }}>{icon}</span>
-        <span style={{ fontSize:13, fontWeight:600, color:"#f1f5f9" }}>{title}</span>
-      </div>
-      <div style={{ fontSize:13, color:"#94a3b8", lineHeight:1.75, paddingLeft:24 }}>{children}</div>
-    </div>
-  );
-
-  return (
-    <div style={{ marginTop:0, marginBottom:20 }}>
-      <button
-        onClick={() => setOpen(!open)}
-        style={{ width:"100%", padding:"13px 18px", borderRadius: open ? "12px 12px 0 0" : 12, cursor:"pointer", background:"#1e293b", border:"1px solid #334155", display:"flex", justifyContent:"space-between", alignItems:"center" }}
-      >
-        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <span style={{ fontSize:14 }}>ℹ️</span>
-          <span style={{ fontSize:13, fontWeight:600, color:"#94a3b8" }}>What is this? Why should I use it? Is it safe?</span>
-        </div>
-        <span style={{ color:"#475569", fontSize:12, fontWeight:600 }}>{open ? "▲ Close" : "▼ Read"}</span>
-      </button>
-
-      {open && (
-        <div style={{ background:"#1e293b", border:"1px solid #334155", borderTop:"none", borderRadius:"0 0 12px 12px", padding:"22px 20px" }}>
-
-          <Section icon="💡" title="How this started">
-            This tool was born from a short article in The Economic Times — <a href="https://economictimes.indiatimes.com/wealth/save/how-your-old-forgotten-upi-ids-may-become-a-security-risk-and-how-to-protectyourself/articleshow/131195220.cms" target="_blank" rel="noopener noreferrer" className="about-link">How your old forgotten UPI IDs may become a security risk</a>. The article explained the risk clearly but offered no easy solution — no tool existed to find all your UPI IDs in one place and walk you through cleaning them up. So we built one. Same evening. Over a glass of wine.
-          </Section>
-
-          <Section icon="❓" title="Why should you care?">
-            Every UPI app you've ever installed — GPay, PhonePe, Paytm, Amazon Pay, CRED — quietly created several UPI IDs the moment you signed up. They don't disappear when you uninstall the app. They don't close when you change your phone number. They don't deactivate when you close a bank account.
-            <br /><br />
-            Most people have 15–40 active UPI IDs they've never seen. If you've ever changed your mobile number, that old number may have been reassigned to someone else by your telecom operator. Your UPI IDs still point to your bank. This is a real, underreported risk.
-          </Section>
-
-          <Section icon="🔧" title="What this tool does">
-            It generates every UPI ID likely created for your mobile numbers across all major apps and banks — based on the standard handle patterns NPCI mandates. It scores each one for risk based on how long it's been idle, your phone number status, and whether the linked bank account is still active. Then it gives you step-by-step instructions to delete the risky ones, app by app. No guessing. No Googling.
-          </Section>
-
-          <Section icon="🔒" title="Your data — exactly what happens to it">
-            <strong style={{ color:"#e2e8f0" }}>Your mobile number never leaves your device.</strong> Full stop. Here is exactly what happens technically:
-            <br /><br />
-            • Your number is held in browser memory (React state) only<br />
-            • It is written to sessionStorage — which clears automatically when you close the tab<br />
-            • It is <strong style={{ color:"#e2e8f0" }}>never</strong> written to localStorage<br />
-            • It is <strong style={{ color:"#e2e8f0" }}>never</strong> sent to any server, API, or backend — because there is none<br />
-            • The share link contains zero personal data — only your app selections<br />
-            • The PDF export masks your number to last 4 digits only<br />
-            <br />
-            Open your browser's DevTools → Network tab while using this tool. You will see zero outgoing requests. That is the proof, not just a promise.
-          </Section>
-
-          <div style={{ background:"#0c1a2e", border:"1px solid #1e3a5f", borderRadius:10, padding:"14px 16px", marginBottom:20 }}>
-            <div style={{ display:"flex", alignItems:"flex-start", gap:10 }}>
-              <span style={{ fontSize:18, flexShrink:0 }}>📊</span>
-              <div>
-                <div style={{ fontSize:13, fontWeight:600, color:"#38bdf8", marginBottom:5 }}>No analytics. Zero. And that's deliberate.</div>
-                <div style={{ fontSize:13, color:"#64748b", lineHeight:1.7 }}>
-                  We know — for a digital analytics professional to ship a tool with no analytics is almost ironic. But for something that touches financial identity, privacy beats insight. There is no Adobe Analytics, no Google Analytics, no Mixpanel, no tracking pixel, no heatmap, no session recording, no event logging. Nothing. If you use this tool, we have no idea. And that's exactly how it should be.
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <Section icon="⚠️" title="Important disclaimer">
-            UPI IDs shown are generated based on standard handle patterns and may not match your exact account state. Always cross-check by dialling <strong style={{ color:"#e2e8f0" }}>*99#</strong> from your SIM — NPCI's own service — before taking any action. This tool is not affiliated with NPCI, UPI, or any bank or payment service provider. It is a free public utility, built for Indian UPI users.
-          </Section>
-
-          <div style={{ borderTop:"1px solid #334155", paddingTop:14, fontSize:12, color:"#475569", lineHeight:1.9 }}>
-            Inspired by <a href="https://economictimes.indiatimes.com/wealth/save/how-your-old-forgotten-upi-ids-may-become-a-security-risk-and-how-to-protectyourself/articleshow/131195220.cms" target="_blank" rel="noopener noreferrer" style={{ color:"#38bdf8", textDecoration:"none", borderBottom:"1px solid #38bdf833" }}>this ET article</a> · Built in one evening · Shipped because it needed to exist.
-          </div>
-
-        </div>
-      )}
     </div>
   );
 }
