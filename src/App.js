@@ -433,14 +433,14 @@ function StatCard({ value, label, color }) {
 const STEPS = ["Setup","VPAs","Risk","Action Plan","Cleanup"];
 function StepIndicator({ current }) {
   return (
-    <div style={{ display:"flex", alignItems:"center", marginBottom:24 }}>
+    <div style={{ display:"flex", alignItems:"center", marginBottom:20, overflow:"hidden" }}>
       {STEPS.map((s,i) => (
-        <div key={s} style={{ display:"flex", alignItems:"center", flex: i<STEPS.length-1 ? 1 : "none" }}>
-          <div style={{ width:28, height:28, borderRadius:"50%", flexShrink:0, background: i<current?"#0ea5e9":i===current?"#fff":"transparent", border: i===current?"2px solid #fff":i<current?"2px solid #0ea5e9":"2px solid #475569", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, color: i<=current?"#0f172a":"#64748b", transition:"all 0.3s" }}>
+        <div key={s} style={{ display:"flex", alignItems:"center", flex: i<STEPS.length-1 ? 1 : "none", minWidth:0 }}>
+          <div style={{ width:26, height:26, borderRadius:"50%", flexShrink:0, background: i<current?"#0ea5e9":i===current?"#fff":"transparent", border: i===current?"2px solid #fff":i<current?"2px solid #0ea5e9":"2px solid #475569", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:700, color: i<=current?"#0f172a":"#64748b", transition:"all 0.3s" }}>
             {i < current ? "✓" : i+1}
           </div>
-          <span style={{ marginLeft:5, fontSize:12, fontWeight: i===current?700:400, color: i===current?"#f1f5f9":i<current?"#0ea5e9":"#475569", whiteSpace:"nowrap" }}>{s}</span>
-          {i < STEPS.length-1 && <div style={{ flex:1, height:1, background: i<current?"#0ea5e9":"#1e293b", margin:"0 8px" }} />}
+          <span className="step-label" style={{ marginLeft:4, fontSize:11, fontWeight: i===current?700:400, color: i===current?"#f1f5f9":i<current?"#0ea5e9":"#475569", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:60 }}>{s}</span>
+          {i < STEPS.length-1 && <div style={{ flex:1, minWidth:4, height:1, background: i<current?"#0ea5e9":"#1e293b", margin:"0 4px" }} />}
         </div>
       ))}
     </div>
@@ -1127,15 +1127,14 @@ function ConsentGate({ onAccept }) {
   const [checked, setChecked] = useState(false);
 
   return (
-    <div style={{ minHeight:"100vh", background:"#0f172a", fontFamily:"'Inter','Segoe UI',sans-serif", display:"flex", alignItems:"flex-start", justifyContent:"center", padding:"16px 12px" }}>
+    <div style={{ minHeight:"100vh", background:"#0f172a", fontFamily:"'Inter','Segoe UI',sans-serif", padding:"16px 12px" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        *{box-sizing:border-box;margin:0;padding:0}
-        @media(max-width:600px){
-          .consent-card{padding:18px 16px !important; border-radius:12px !important}
-        }
+        html,body,#root{margin:0;padding:0;width:100%}
+        *{box-sizing:border-box}
+        body{background:#0f172a;overflow-x:hidden}
       `}</style>
-      <div style={{ width:"100%", maxWidth:480 }}>
+      <div style={{ width:"100%", maxWidth:480, margin:"0 auto" }}>
 
         {/* Logo */}
         <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:32 }}>
@@ -1277,10 +1276,12 @@ export default function App() {
   if (!consented) return <ConsentGate onAccept={handleConsent} />;
 
   return (
-    <div style={{ minHeight:"100vh", background:"#0f172a", fontFamily:"'Inter','Segoe UI',sans-serif", display:"flex", justifyContent:"center", padding:"16px 12px" }}>
+    <div style={{ minHeight:"100vh", background:"#0f172a", fontFamily:"'Inter','Segoe UI',sans-serif", padding:"16px 12px" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
-        *{box-sizing:border-box;margin:0;padding:0}
+        html,body,#root{margin:0;padding:0;width:100%}
+        *{box-sizing:border-box}
+        body{background:#0f172a;overflow-x:hidden}
         select option{background:#1e293b;color:#f1f5f9}
         ::-webkit-scrollbar{width:4px}
         ::-webkit-scrollbar-thumb{background:#334155;border-radius:4px}
@@ -1290,12 +1291,12 @@ export default function App() {
         .about-link{color:#38bdf8;text-decoration:none;border-bottom:1px solid #38bdf833}
         .about-link:hover{border-bottom-color:#38bdf8}
         @media(max-width:600px){
-          .app-inner{padding:14px 14px !important}
-          .app-header{margin-bottom:16px !important}
+          .app-inner{padding:16px 14px !important}
+          .step-label{display:none}
         }
       `}</style>
 
-      <div style={{ width:"100%", maxWidth:540 }}>
+      <div style={{ width:"100%", maxWidth:540, margin:"0 auto" }}>
         {/* Header */}
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24 }}>
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
