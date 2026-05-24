@@ -586,6 +586,38 @@ function ShareModal({ sims, vpas, done, onClose }) {
   );
 }
 
+function ConsentDetail() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ marginBottom:14 }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{ background:"none", border:"none", cursor:"pointer", fontSize:12, color:"#38bdf8", padding:"4px 0", textDecoration:"underline", textUnderlineOffset:3 }}>
+        {open ? "▲ Hide details" : "▼ What does this tool do and not do?"}
+      </button>
+      {open && (
+        <div style={{ marginTop:8, background:"#0f172a", border:"1px solid #334155", borderRadius:10, padding:"13px 14px" }}>
+          <div style={{ fontSize:11, fontWeight:600, color:"#64748b", letterSpacing:0.5, textTransform:"uppercase", marginBottom:10 }}>This tool does NOT</div>
+          {[
+            "Access your bank account or UPI apps",
+            "Verify whether any UPI ID is real or active",
+            "Connect to NPCI, any bank, or any external service",
+            "Store, transmit, or log your mobile number anywhere",
+          ].map((item, i) => (
+            <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:8 }}>
+              <span style={{ color:"#ef4444", fontSize:13, flexShrink:0 }}>✕</span>
+              <span style={{ fontSize:13, color:"#94a3b8", lineHeight:1.5 }}>{item}</span>
+            </div>
+          ))}
+          <div style={{ borderTop:"1px solid #1e293b", marginTop:10, paddingTop:10, fontSize:12, color:"#475569", lineHeight:1.6 }}>
+            UPI IDs are generated based on standard handle patterns — not by connecting to any bank or NPCI. Always verify via <strong style={{ color:"#94a3b8", fontFamily:"monospace" }}>*99#</strong> before taking action.
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─────────────────────────────────────────────
 // STEP 0 — SETUP
 // ─────────────────────────────────────────────
@@ -599,10 +631,11 @@ const blankSIM = () => ({
 
 function Step0Setup({ onNext, initialSims }) {
   const [sims, setSims] = useState(initialSims && initialSims.length ? initialSims : [blankSIM()]);
+  const [consented, setConsented] = useState(false);
 
   const updateSIM = (i, val) => setSims(sims.map((s,j) => j===i ? val : s));
 
-  const valid = sims.every(s =>
+  const valid = consented && sims.every(s =>
     isValidMobile(s.mobile) && (s.selectedApps.length + s.selectedBanks.length) > 0
   );
 
@@ -612,7 +645,6 @@ function Step0Setup({ onNext, initialSims }) {
       <p style={{ color:"#94a3b8", fontSize:14, marginBottom:16, lineHeight:1.6 }}>
         Add every number you've used for UPI — current and old SIMs. All data stays local.
       </p>
-      {/* Security notice */}
       <div style={{ background:"#0c2a1a", border:"1px solid #166534", borderRadius:8, padding:"11px 14px", marginBottom:16, fontSize:13, color:"#4ade80", lineHeight:1.6 }}>
         🔒 <strong>Privacy:</strong> Your mobile number is held in memory only and cleared when you close this tab. Never written to disk or sent anywhere.
       </div>
@@ -625,9 +657,25 @@ function Step0Setup({ onNext, initialSims }) {
         />
       ))}
 
-      <button onClick={()=>setSims([...sims,blankSIM()])} style={{ width:"100%", padding:"11px", borderRadius:10, fontSize:13, fontWeight:600, border:"1.5px dashed #334155", background:"transparent", color:"#64748b", cursor:"pointer", marginBottom:14 }}>
+      <button onClick={()=>setSims([...sims,blankSIM()])} style={{ width:"100%", padding:"11px", borderRadius:10, fontSize:13, fontWeight:600, border:"1.5px dashed #334155", background:"transparent", color:"#64748b", cursor:"pointer", marginBottom:16 }}>
         + Add another SIM / old number
       </button>
+
+      {/* Consent checkbox — at point of action, not at the door */}
+      <label style={{ display:"flex", alignItems:"flex-start", gap:12, cursor:"pointer", marginBottom:8, padding:"13px 14px", background: consented ? "#0c2a1a" : "#0f172a", border:`1px solid ${consented ? "#166534" : "#334155"}`, borderRadius:10, transition:"all 0.2s" }}>
+        <div
+          onClick={() => setConsented(!consented)}
+          style={{ width:20, height:20, borderRadius:5, border:`2px solid ${consented ? "#22c55e" : "#475569"}`, background: consented ? "#22c55e" : "transparent", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginTop:1, cursor:"pointer", transition:"all 0.2s" }}>
+          {consented && <span style={{ color:"#fff", fontSize:12, fontWeight:700 }}>✓</span>}
+        </div>
+        <span style={{ fontSize:13, color: consented ? "#4ade80" : "#94a3b8", lineHeight:1.6, transition:"color 0.2s" }}>
+          I confirm I am entering <strong style={{ color: consented ? "#86efac" : "#e2e8f0" }}>my own mobile number(s) only.</strong> I understand this tool generates likely UPI IDs based on public patterns and does not access any bank or payment system.
+        </span>
+      </label>
+
+      {/* Expandable detail — available but not in your face */}
+      <ConsentDetail />
+
       <button onClick={()=>valid&&onNext(sims)} disabled={!valid} style={{ ...bp, background:valid?"#0ea5e9":"#1e293b", color:valid?"#fff":"#475569", cursor:valid?"pointer":"not-allowed" }}>
         Generate UPI ID List →
       </button>
@@ -1116,85 +1164,6 @@ function AboutPanel() {
   );
 }
 
-// ─────────────────────────────────────────────
-// CONSENT GATE
-// Shown once per session before the tool loads.
-// Persists acceptance to sessionStorage — won't
-// re-appear on refresh within the same session.
-// ─────────────────────────────────────────────
-
-function ConsentGate({ onAccept }) {
-  const [checked, setChecked] = useState(false);
-
-  return (
-    <div style={{ minHeight:"100vh", background:"#0f172a", fontFamily:"'Inter','Segoe UI',sans-serif", padding:"16px 12px" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        html,body,#root{margin:0;padding:0;width:100%}
-        *{box-sizing:border-box}
-        body{background:#0f172a;overflow-x:hidden}
-      `}</style>
-      <div style={{ width:"100%", maxWidth:480, margin:"0 auto" }}>
-
-        {/* Logo */}
-        <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:32 }}>
-          <div style={{ width:40, height:40, borderRadius:10, background:"linear-gradient(135deg,#0ea5e9,#0369a1)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, fontWeight:700, color:"#fff" }}>₹</div>
-          <div>
-            <div style={{ fontSize:18, fontWeight:700, color:"#f1f5f9", letterSpacing:-0.3 }}>UPI ID Health Check</div>
-            <div style={{ fontSize:11, color:"#475569", marginTop:1 }}>Find · Risk-Score · Clean Up</div>
-          </div>
-        </div>
-
-        <div className="consent-card" style={{ background:"#1e293b", border:"1px solid #334155", borderRadius:16, padding:"22px 18px" }}>
-
-          <div style={{ fontSize:22, fontWeight:700, color:"#f1f5f9", marginBottom:8 }}>Before you begin</div>
-          <p style={{ fontSize:14, color:"#94a3b8", lineHeight:1.7, marginBottom:24 }}>
-            This tool generates likely UPI IDs based on your mobile number and publicly known handle patterns. It does <strong style={{ color:"#e2e8f0" }}>not</strong> connect to any bank, NPCI, or UPI system — and cannot verify whether any ID is active.
-          </p>
-
-          {/* What this tool does NOT do */}
-          <div style={{ background:"#0f172a", border:"1px solid #334155", borderRadius:10, padding:"14px 16px", marginBottom:24 }}>
-            <div style={{ fontSize:12, fontWeight:600, color:"#64748b", letterSpacing:0.5, textTransform:"uppercase", marginBottom:10 }}>This tool does NOT</div>
-            {[
-              "Access your bank account or UPI apps",
-              "Verify whether any UPI ID is real or active",
-              "Connect to NPCI, any bank, or any external service",
-              "Store, transmit, or log your mobile number anywhere",
-            ].map((item, i) => (
-              <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:8 }}>
-                <span style={{ color:"#ef4444", fontSize:14, flexShrink:0, marginTop:1 }}>✕</span>
-                <span style={{ fontSize:13, color:"#94a3b8", lineHeight:1.5 }}>{item}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Consent checkbox */}
-          <label style={{ display:"flex", alignItems:"flex-start", gap:12, cursor:"pointer", marginBottom:24, padding:"14px 16px", background: checked ? "#0c2a1a" : "#0f172a", border:`1px solid ${checked ? "#166534" : "#334155"}`, borderRadius:10, transition:"all 0.2s" }}>
-            <div
-              onClick={() => setChecked(!checked)}
-              style={{ width:20, height:20, borderRadius:5, border:`2px solid ${checked ? "#22c55e" : "#475569"}`, background: checked ? "#22c55e" : "transparent", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginTop:1, cursor:"pointer", transition:"all 0.2s" }}>
-              {checked && <span style={{ color:"#fff", fontSize:12, fontWeight:700 }}>✓</span>}
-            </div>
-            <span style={{ fontSize:13, color: checked ? "#4ade80" : "#94a3b8", lineHeight:1.6, transition:"color 0.2s" }}>
-              I confirm I am entering <strong style={{ color: checked ? "#86efac" : "#e2e8f0" }}>my own mobile number(s) only.</strong> I understand this tool generates likely UPI IDs based on public patterns and does not access any bank or payment system.
-            </span>
-          </label>
-
-          <button
-            onClick={() => checked && onAccept()}
-            disabled={!checked}
-            style={{ width:"100%", padding:"14px", borderRadius:10, fontSize:14, fontWeight:700, border:"none", cursor: checked ? "pointer" : "not-allowed", background: checked ? "#0ea5e9" : "#1e293b", color: checked ? "#fff" : "#475569", transition:"all 0.2s" }}>
-            {checked ? "I understand — start my UPI ID health check →" : "Please confirm above to continue"}
-          </button>
-
-          <div style={{ textAlign:"center", marginTop:14, fontSize:11, color:"#334155" }}>
-            No data transmitted · No backend · No analytics
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────────
 // MAIN APP
@@ -1207,22 +1176,9 @@ export default function App() {
   const [showBanner, setShowBanner] = useState(false);
   const [mobilesPresent, setMobilesPresent] = useState(false);
 
-  // Consent gate — persists for the session, not across tabs/closes
-  const [consented, setConsented] = useState(() => {
-    try { return sessionStorage.getItem("upi_consent") === "1"; } catch(_) { return false; }
-  });
-
-  const handleConsent = () => {
-    try { sessionStorage.setItem("upi_consent", "1"); } catch(_) {}
-    setConsented(true);
-  };
-
-  // On mount: URL config first (PII-free), then localStorage + sessionStorage merge
-  // NOTE: hooks must all be declared before any early return — Rules of Hooks
+  // On mount: URL config first, then localStorage + sessionStorage merge
   useEffect(() => {
-    if (!consented) return; // don't restore session until consent given
     localStorage.removeItem("upi_audit_v3");
-
     const fromURL = decodeConfigFromURL();
     if (fromURL) {
       const restoredSims = fromURL.map(cfg => ({ ...blankSIM(), ...cfg, mobile: "" }));
@@ -1232,7 +1188,6 @@ export default function App() {
       setShowBanner(true);
       return;
     }
-
     const meta = loadMetaLocalStorage();
     if (meta) {
       const merged = mergeRestoredSession(meta);
@@ -1243,7 +1198,7 @@ export default function App() {
       setMobilesPresent(hasMobiles);
       setShowBanner(true);
     }
-  }, [consented]);
+  }, []);
 
   // Auto-save on state change
   useEffect(() => {
@@ -1271,9 +1226,6 @@ export default function App() {
     clearAllStorage();
     setSims(null); setStep(0); setDone([]); setShowBanner(false);
   };
-
-  // All hooks declared above — safe to conditionally return now
-  if (!consented) return <ConsentGate onAccept={handleConsent} />;
 
   return (
     <div style={{ minHeight:"100vh", background:"#0f172a", fontFamily:"'Inter','Segoe UI',sans-serif", padding:"16px 12px" }}>
