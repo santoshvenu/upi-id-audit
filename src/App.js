@@ -12,7 +12,7 @@ import React, { useState, useMemo, useEffect, useCallback } from "react";
  *    Full numbers live in React state (memory only) — cleared on page close.
  *
  * 2. URL share payload contains ZERO PII.
- *    Only encodes: selectedApps[], selectedBanks[], lastUsed, phoneStatus,
+ *    Only encodes: selectedApps[], selectedBanks[], phoneStatus,
  *    bankStatus, label (user-chosen display name, no number).
  *    Recipient must enter their own mobile number.
  *
@@ -129,32 +129,28 @@ const STORAGE_KEY = "upi_audit_v4_meta"; // NEW KEY — v3 data is stale and con
 // RISK ENGINE
 // ─────────────────────────────────────────────
 
-function scoreVPA({ appId, lastUsedYear, phoneNumberStatus, bankAccountStatus }) {
+function scoreVPA({ appId, phoneNumberStatus, bankAccountStatus }) {
   let score = 0; const flags = [];
-  const yearsIdle = lastUsedYear ? new Date().getFullYear() - lastUsedYear : 3;
-  if (yearsIdle >= 3)                        { score += 35; flags.push(`Idle ${yearsIdle}+ years`); }
-  else if (yearsIdle >= 1)                   { score += 15; flags.push(`Idle ${yearsIdle} year(s)`); }
-  if (phoneNumberStatus === "changed")       { score += 40; flags.push("Phone number changed/surrendered"); }
-  else if (phoneNumberStatus === "inactive") { score += 30; flags.push("Phone number inactive"); }
-  if (bankAccountStatus === "closed")        { score += 30; flags.push("Bank account closed"); }
-  else if (bankAccountStatus === "dormant")  { score += 20; flags.push("Account dormant"); }
+  if (phoneNumberStatus === "changed")       { score += 50; flags.push("Phone number changed/surrendered"); }
+  else if (phoneNumberStatus === "inactive") { score += 35; flags.push("Phone number inactive"); }
+  if (bankAccountStatus === "closed")        { score += 35; flags.push("Bank account closed"); }
+  else if (bankAccountStatus === "dormant")  { score += 20; flags.push("Bank account dormant"); }
   const app = PSP_DATA.find(p => p.id === appId);
-  if (app?.difficulty === "hard")            { score += 5;  flags.push("Hard to remove"); }
+  if (app?.difficulty === "hard")            { score += 5;  flags.push("Harder to remove"); }
   score = Math.min(score, 100);
   const level = score >= 60 ? "HIGH" : score >= 30 ? "MEDIUM" : "LOW";
-  const color = score >= 60 ? "#FF4444" : score >= 30 ? "#FF9F1C" : "#2EC4B6";
+  const color = score >= 60 ? "#ef4444" : score >= 30 ? "#f59e0b" : "#22c55e";
   return { score, level, color, flags };
 }
 
-function generateVPAsForSIM({ mobile, selectedApps, selectedBanks, lastUsed, phoneStatus, bankStatus, label }) {
+function generateVPAsForSIM({ mobile, selectedApps, selectedBanks, phoneStatus, bankStatus, label }) {
   const vpas = [];
-  // Only use last 10 digits, validated before reaching here
   const suffix = mobile.replace(/\D/g, "").slice(-10);
   selectedApps.forEach(appId => {
     const app = PSP_DATA.find(p => p.id === appId); if (!app) return;
     app.handles.forEach(handle => {
       vpas.push({ vpa: `${suffix}${handle}`, appId, appName: app.name, handle,
-        risk: scoreVPA({ appId, lastUsedYear: lastUsed, phoneNumberStatus: phoneStatus, bankAccountStatus: bankStatus }),
+        risk: scoreVPA({ appId, phoneNumberStatus: phoneStatus, bankAccountStatus: bankStatus }),
         type: "psp", cleanupSteps: app.cleanupSteps, color: app.color, simLabel: label, mobile });
     });
   });
@@ -162,7 +158,7 @@ function generateVPAsForSIM({ mobile, selectedApps, selectedBanks, lastUsed, pho
     const bank = BANK_DATA.find(b => b.id === bankId); if (!bank) return;
     bank.handles.forEach(handle => {
       vpas.push({ vpa: `${suffix}${handle}`, bankId, appName: bank.name, handle,
-        risk: scoreVPA({ lastUsedYear: lastUsed, phoneNumberStatus: phoneStatus, bankAccountStatus: bankStatus }),
+        risk: scoreVPA({ phoneNumberStatus: phoneStatus, bankAccountStatus: bankStatus }),
         type: "bank", cleanupSteps: bank.cleanupSteps, color: bank.color, simLabel: label, mobile });
     });
   });
@@ -195,7 +191,6 @@ function saveMetaLocalStorage({ sims, step, done }) {
   const simsMeta = sims.map(s => ({
     id: s.id,
     label: s.label,
-    lastUsed: s.lastUsed,
     phoneStatus: s.phoneStatus,
     bankStatus: s.bankStatus,
     selectedApps: s.selectedApps,
@@ -244,7 +239,7 @@ function clearAllStorage() {
 
 /**
  * URL payload contains ONLY:
- * - selectedApps[], selectedBanks[], lastUsed, phoneStatus, bankStatus, label
+ * - selectedApps[], selectedBanks[], phoneStatus, bankStatus, label
  * NO mobile numbers. Recipient enters their own number.
  */
 function encodeConfigToURL(sims) {
@@ -252,10 +247,9 @@ function encodeConfigToURL(sims) {
     const safePayload = sims.map(s => ({
       selectedApps:  s.selectedApps,
       selectedBanks: s.selectedBanks,
-      lastUsed:      s.lastUsed,
       phoneStatus:   s.phoneStatus,
       bankStatus:    s.bankStatus,
-      label:         s.label ? s.label.slice(0, 30) : "", // cap label length
+      label:         s.label ? s.label.slice(0, 30) : "",
     }));
     const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(safePayload))));
     return `${window.location.href.split("?")[0]}?c=${encoded}`;
@@ -383,7 +377,7 @@ function exportToPDF(allVPAs, sims) {
   </ol>
   <div style="font-size:10px;color:#999;margin-top:6px">⚠ Read-only. Cannot delete VPAs.</div>
 </div>
-<div class="footer">UPI Audit v0.4 · Re-audit every 6 months · No data stored or transmitted to any server</div>
+<div class="footer">UPI ID Health Check v1.1.1 · Re-audit every 6 months · No data stored or transmitted to any server</div>
 </body></html>`;
 
   const win = window.open("", "_blank");
@@ -505,18 +499,12 @@ function SIMCard({ sim, index, onChange, onRemove, canRemove }) {
             maxLength={30}
           />
         </div>
-        <div>
-          <label style={ls}>Last used (year)</label>
-          <select value={sim.lastUsed} onChange={e => onChange({...sim, lastUsed:parseInt(e.target.value)})} style={is}>
-            {[2026,2025,2024,2023,2022,2021,2020,2019,2018].map(y=><option key={y} value={y}>{y}</option>)}
-          </select>
-        </div>
-        <div>
-          <label style={ls}>Phone status</label>
+        <div style={{ gridColumn:"1/-1" }}>
+          <label style={ls}>Phone number status</label>
           <select value={sim.phoneStatus} onChange={e => onChange({...sim, phoneStatus:e.target.value})} style={is}>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="changed">Changed / Surrendered</option>
+            <option value="active">Active — I still use this number</option>
+            <option value="inactive">Inactive — number not in use</option>
+            <option value="changed">Changed / Surrendered — no longer mine</option>
           </select>
         </div>
         <div style={{ gridColumn:"1/-1" }}>
@@ -604,7 +592,7 @@ function ShareModal({ sims, vpas, done, onClose }) {
 
 const blankSIM = () => ({
   id: Math.random().toString(36).slice(2),
-  mobile:"", label:"", lastUsed:2022,
+  mobile:"", label:"",
   phoneStatus:"active", bankStatus:"active",
   selectedApps:[], selectedBanks:[],
 });
@@ -704,7 +692,7 @@ function Step2Risk({ vpas, onNext, onBack }) {
     <div>
       <h2 style={{ fontSize:22, fontWeight:700, color:"#f1f5f9", marginBottom:6 }}>Risk breakdown</h2>
       <p style={{ color:"#94a3b8", fontSize:14, marginBottom:16, lineHeight:1.6 }}>
-        Based on what you told us — idle time, phone status, and bank account status.
+        Based on what you told us — your phone number status and bank account status.
       </p>
 
       {/* Risk score explainer */}
@@ -717,11 +705,11 @@ function Step2Risk({ vpas, onNext, onBack }) {
         </div>
         <div style={{ marginTop:12, display:"flex", flexWrap:"wrap", gap:8 }}>
           {[
-            { label:"Years idle", pts:"up to 35 pts" },
-            { label:"Phone number changed", pts:"40 pts" },
-            { label:"Phone inactive", pts:"30 pts" },
-            { label:"Bank account closed", pts:"30 pts" },
-            { label:"Account dormant", pts:"20 pts" },
+            { label:"Phone number changed/surrendered", pts:"50 pts" },
+            { label:"Phone number inactive",            pts:"35 pts" },
+            { label:"Bank account closed",              pts:"35 pts" },
+            { label:"Bank account dormant",             pts:"20 pts" },
+            { label:"App harder to remove",             pts:"5 pts"  },
           ].map((f,i) => (
             <div key={i} style={{ fontSize:11, color:"#475569", background:"#0f172a", border:"1px solid #1e293b", borderRadius:6, padding:"3px 9px" }}>
               {f.label} <span style={{ color:"#334155" }}>· {f.pts}</span>
@@ -1086,7 +1074,7 @@ function AboutPanel() {
           </Section>
 
           <Section icon="🔧" title="What this tool does">
-            It generates every UPI ID likely created for your mobile numbers across all major apps and banks — based on the standard handle patterns NPCI mandates. It scores each one for risk based on how long it's been idle, your phone number status, and whether the linked bank account is still active. Then it gives you step-by-step instructions to delete the risky ones, app by app. No guessing. No Googling.
+            It generates every UPI ID likely created for your mobile numbers across all major apps and banks — based on the standard handle patterns NPCI mandates. It scores each one for risk based on your phone number status and whether the linked bank account is still active. Then it gives you step-by-step instructions to delete the risky ones, app by app. No guessing. No Googling.
           </Section>
 
           <Section icon="🔒" title="Your data — exactly what happens to it">
@@ -1119,7 +1107,7 @@ function AboutPanel() {
           </Section>
 
           <div style={{ borderTop:"1px solid #334155", paddingTop:14, fontSize:12, color:"#475569", lineHeight:1.9 }}>
-            Inspired by <a href="https://economictimes.indiatimes.com/wealth/save/how-your-old-forgotten-upi-ids-may-become-a-security-risk-and-how-to-protectyourself/articleshow/131195220.cms" target="_blank" rel="noopener noreferrer" style={{ color:"#38bdf8", textDecoration:"none", borderBottom:"1px solid #38bdf833" }}>this ET article</a> · Built in one evening · Shipped because it needed to exist.
+            Inspired by <a href="https://economictimes.indiatimes.com/wealth/save/how-your-old-forgotten-upi-ids-may-become-a-security-risk-and-how-to-protectyourself/articleshow/131195220.cms" target="_blank" rel="noopener noreferrer" style={{ color:"#38bdf8", textDecoration:"none", borderBottom:"1px solid #38bdf833" }}>this ET article</a> · Built with <a href="https://claude.ai" target="_blank" rel="noopener noreferrer" style={{ color:"#38bdf8", textDecoration:"none", borderBottom:"1px solid #38bdf833" }}>Claude</a> in one evening · Shipped because it needed to exist.
           </div>
 
         </div>
@@ -1224,20 +1212,15 @@ export default function App() {
     setConsented(true);
   };
 
-  // Show consent gate if not yet accepted this session
-  if (!consented) return <ConsentGate onAccept={handleConsent} />;
-
   // On mount: URL config first (PII-free), then localStorage + sessionStorage merge
+  // NOTE: hooks must all be declared before any early return — Rules of Hooks
   useEffect(() => {
-    // Wipe any old v3 data that contained full mobile numbers
+    if (!consented) return; // don't restore session until consent given
     localStorage.removeItem("upi_audit_v3");
 
     const fromURL = decodeConfigFromURL();
     if (fromURL) {
-      // URL share: build blank SIMs with config but no mobile numbers
-      const restoredSims = fromURL.map(cfg => ({
-        ...blankSIM(), ...cfg, mobile: "",
-      }));
+      const restoredSims = fromURL.map(cfg => ({ ...blankSIM(), ...cfg, mobile: "" }));
       setSims(restoredSims);
       setStep(1);
       setMobilesPresent(false);
@@ -1255,9 +1238,9 @@ export default function App() {
       setMobilesPresent(hasMobiles);
       setShowBanner(true);
     }
-  }, []);
+  }, [consented]);
 
-  // Auto-save on state change — mobile numbers go to sessionStorage, meta to localStorage
+  // Auto-save on state change
   useEffect(() => {
     if (sims) {
       saveMobilesSession(sims);
@@ -1268,10 +1251,10 @@ export default function App() {
   const vpas = useMemo(() => {
     if (!sims) return [];
     return sims.flatMap((s, idx) => {
-      if (!isValidMobile(s.mobile)) return []; // skip invalid numbers silently
+      if (!isValidMobile(s.mobile)) return [];
       return generateVPAsForSIM({
         mobile: s.mobile, selectedApps: s.selectedApps, selectedBanks: s.selectedBanks,
-        lastUsed: s.lastUsed, phoneStatus: s.phoneStatus, bankStatus: s.bankStatus,
+        phoneStatus: s.phoneStatus, bankStatus: s.bankStatus,
         label: s.label || `SIM ${idx+1}`,
       });
     });
@@ -1283,6 +1266,9 @@ export default function App() {
     clearAllStorage();
     setSims(null); setStep(0); setDone([]); setShowBanner(false);
   };
+
+  // All hooks declared above — safe to conditionally return now
+  if (!consented) return <ConsentGate onAccept={handleConsent} />;
 
   return (
     <div style={{ minHeight:"100vh", background:"#0f172a", fontFamily:"'Inter','Segoe UI',sans-serif", display:"flex", justifyContent:"center", padding:"24px 16px" }}>
@@ -1334,10 +1320,10 @@ export default function App() {
             <div style={{ fontSize:12, color:"#475569" }}>
               Built by <strong style={{ color:"#94a3b8" }}>Santosh Krishna Venuturupalli</strong> · <a href="https://www.linkedin.com/in/santoshkrishna" target="_blank" rel="noopener noreferrer" style={{ color:"#38bdf8", textDecoration:"none" }}>LinkedIn</a>
             </div>
-            <div style={{ fontSize:11, color:"#334155" }}>v1.0</div>
+            <div style={{ fontSize:11, color:"#334155" }}>v1.1.1</div>
           </div>
           <div style={{ fontSize:12, color:"#475569", fontStyle:"italic", lineHeight:1.6 }}>
-            Inspired by <a href="https://economictimes.indiatimes.com/wealth/save/how-your-old-forgotten-upi-ids-may-become-a-security-risk-and-how-to-protectyourself/articleshow/131195220.cms" target="_blank" rel="noopener noreferrer" style={{ color:"#38bdf8", textDecoration:"none", borderBottom:"1px solid #38bdf833" }}>this ET article</a> · Built in one evening · Shipped because it needed to exist.
+            Inspired by <a href="https://economictimes.indiatimes.com/wealth/save/how-your-old-forgotten-upi-ids-may-become-a-security-risk-and-how-to-protectyourself/articleshow/131195220.cms" target="_blank" rel="noopener noreferrer" style={{ color:"#38bdf8", textDecoration:"none", borderBottom:"1px solid #38bdf833" }}>this ET article</a> · Built with <a href="https://claude.ai" target="_blank" rel="noopener noreferrer" style={{ color:"#38bdf8", textDecoration:"none", borderBottom:"1px solid #38bdf833" }}>Claude</a> in one evening · Shipped because it needed to exist.
           </div>
           <div style={{ fontSize:11, color:"#334155" }}>
             No data transmitted · No analytics · Not affiliated with NPCI or any bank
