@@ -1127,8 +1127,14 @@ function ConsentGate({ onAccept }) {
   const [checked, setChecked] = useState(false);
 
   return (
-    <div style={{ minHeight:"100vh", background:"#0f172a", fontFamily:"'Inter','Segoe UI',sans-serif", display:"flex", alignItems:"center", justifyContent:"center", padding:"24px 16px" }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');*{box-sizing:border-box;margin:0;padding:0}`}</style>
+    <div style={{ minHeight:"100vh", background:"#0f172a", fontFamily:"'Inter','Segoe UI',sans-serif", display:"flex", alignItems:"flex-start", justifyContent:"center", padding:"16px 12px" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        *{box-sizing:border-box;margin:0;padding:0}
+        @media(max-width:600px){
+          .consent-card{padding:18px 16px !important; border-radius:12px !important}
+        }
+      `}</style>
       <div style={{ width:"100%", maxWidth:480 }}>
 
         {/* Logo */}
@@ -1140,7 +1146,7 @@ function ConsentGate({ onAccept }) {
           </div>
         </div>
 
-        <div style={{ background:"#1e293b", border:"1px solid #334155", borderRadius:16, padding:"28px 24px" }}>
+        <div className="consent-card" style={{ background:"#1e293b", border:"1px solid #334155", borderRadius:16, padding:"22px 18px" }}>
 
           <div style={{ fontSize:22, fontWeight:700, color:"#f1f5f9", marginBottom:8 }}>Before you begin</div>
           <p style={{ fontSize:14, color:"#94a3b8", lineHeight:1.7, marginBottom:24 }}>
@@ -1271,7 +1277,7 @@ export default function App() {
   if (!consented) return <ConsentGate onAccept={handleConsent} />;
 
   return (
-    <div style={{ minHeight:"100vh", background:"#0f172a", fontFamily:"'Inter','Segoe UI',sans-serif", display:"flex", justifyContent:"center", padding:"24px 16px" }}>
+    <div style={{ minHeight:"100vh", background:"#0f172a", fontFamily:"'Inter','Segoe UI',sans-serif", display:"flex", justifyContent:"center", padding:"16px 12px" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
         *{box-sizing:border-box;margin:0;padding:0}
@@ -1283,6 +1289,10 @@ export default function App() {
         button:hover{opacity:0.88}
         .about-link{color:#38bdf8;text-decoration:none;border-bottom:1px solid #38bdf833}
         .about-link:hover{border-bottom-color:#38bdf8}
+        @media(max-width:600px){
+          .app-inner{padding:14px 14px !important}
+          .app-header{margin-bottom:16px !important}
+        }
       `}</style>
 
       <div style={{ width:"100%", maxWidth:540 }}>
@@ -1307,7 +1317,7 @@ export default function App() {
 
         <StepIndicator current={step} />
 
-        <div style={{ background:"#1e293b", border:"1px solid #334155", borderRadius:16, padding:"26px 22px", boxShadow:"0 20px 60px rgba(0,0,0,0.4)" }}>
+        <div className="app-inner" style={{ background:"#1e293b", border:"1px solid #334155", borderRadius:16, padding:"20px 16px", boxShadow:"0 20px 60px rgba(0,0,0,0.4)" }}>
           {step === 0 && <Step0Setup onNext={handleSetup} initialSims={sims} />}
           {step === 1 && <Step1VPAs sims={sims} vpas={vpas} onNext={()=>setStep(2)} onBack={()=>setStep(0)} />}
           {step === 2 && <Step2Risk vpas={vpas} onNext={()=>setStep(3)} onBack={()=>setStep(1)} />}
