@@ -885,6 +885,81 @@ function RestoreBanner({ mobilesPresent, onDismiss, onClear }) {
 }
 
 // ─────────────────────────────────────────────
+// CONSENT GATE
+// Shown once per session before the tool loads.
+// Persists acceptance to sessionStorage — won't
+// re-appear on refresh within the same session.
+// ─────────────────────────────────────────────
+
+function ConsentGate({ onAccept }) {
+  const [checked, setChecked] = useState(false);
+
+  return (
+    <div style={{ minHeight:"100vh", background:"#0f172a", fontFamily:"'Inter','Segoe UI',sans-serif", display:"flex", alignItems:"center", justifyContent:"center", padding:"24px 16px" }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');*{box-sizing:border-box;margin:0;padding:0}`}</style>
+      <div style={{ width:"100%", maxWidth:480 }}>
+
+        {/* Logo */}
+        <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:32 }}>
+          <div style={{ width:40, height:40, borderRadius:10, background:"linear-gradient(135deg,#0ea5e9,#0369a1)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, fontWeight:700, color:"#fff" }}>₹</div>
+          <div>
+            <div style={{ fontSize:18, fontWeight:700, color:"#f1f5f9", letterSpacing:-0.3 }}>UPI ID Health Check</div>
+            <div style={{ fontSize:11, color:"#475569", marginTop:1 }}>Find · Risk-Score · Clean Up</div>
+          </div>
+        </div>
+
+        <div style={{ background:"#1e293b", border:"1px solid #334155", borderRadius:16, padding:"28px 24px" }}>
+
+          <div style={{ fontSize:22, fontWeight:700, color:"#f1f5f9", marginBottom:8 }}>Before you begin</div>
+          <p style={{ fontSize:14, color:"#94a3b8", lineHeight:1.7, marginBottom:24 }}>
+            This tool generates likely UPI IDs based on your mobile number and publicly known handle patterns. It does <strong style={{ color:"#e2e8f0" }}>not</strong> connect to any bank, NPCI, or UPI system — and cannot verify whether any ID is active.
+          </p>
+
+          {/* What this tool does NOT do */}
+          <div style={{ background:"#0f172a", border:"1px solid #334155", borderRadius:10, padding:"14px 16px", marginBottom:24 }}>
+            <div style={{ fontSize:12, fontWeight:600, color:"#64748b", letterSpacing:0.5, textTransform:"uppercase", marginBottom:10 }}>This tool does NOT</div>
+            {[
+              "Access your bank account or UPI apps",
+              "Verify whether any UPI ID is real or active",
+              "Connect to NPCI, any bank, or any external service",
+              "Store, transmit, or log your mobile number anywhere",
+            ].map((item, i) => (
+              <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:8 }}>
+                <span style={{ color:"#ef4444", fontSize:14, flexShrink:0, marginTop:1 }}>✕</span>
+                <span style={{ fontSize:13, color:"#94a3b8", lineHeight:1.5 }}>{item}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Consent checkbox */}
+          <label style={{ display:"flex", alignItems:"flex-start", gap:12, cursor:"pointer", marginBottom:24, padding:"14px 16px", background: checked ? "#0c2a1a" : "#0f172a", border:`1px solid ${checked ? "#166534" : "#334155"}`, borderRadius:10, transition:"all 0.2s" }}>
+            <div
+              onClick={() => setChecked(!checked)}
+              style={{ width:20, height:20, borderRadius:5, border:`2px solid ${checked ? "#22c55e" : "#475569"}`, background: checked ? "#22c55e" : "transparent", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginTop:1, cursor:"pointer", transition:"all 0.2s" }}>
+              {checked && <span style={{ color:"#fff", fontSize:12, fontWeight:700 }}>✓</span>}
+            </div>
+            <span style={{ fontSize:13, color: checked ? "#4ade80" : "#94a3b8", lineHeight:1.6, transition:"color 0.2s" }}>
+              I confirm I am entering <strong style={{ color: checked ? "#86efac" : "#e2e8f0" }}>my own mobile number(s) only.</strong> I understand this tool generates likely UPI IDs based on public patterns and does not access any bank or payment system.
+            </span>
+          </label>
+
+          <button
+            onClick={() => checked && onAccept()}
+            disabled={!checked}
+            style={{ width:"100%", padding:"14px", borderRadius:10, fontSize:14, fontWeight:700, border:"none", cursor: checked ? "pointer" : "not-allowed", background: checked ? "#0ea5e9" : "#1e293b", color: checked ? "#fff" : "#475569", transition:"all 0.2s" }}>
+            {checked ? "I understand — start my UPI ID health check →" : "Please confirm above to continue"}
+          </button>
+
+          <div style={{ textAlign:"center", marginTop:14, fontSize:11, color:"#334155" }}>
+            No data transmitted · No backend · No analytics
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
 // MAIN APP
 // ─────────────────────────────────────────────
 
@@ -894,6 +969,19 @@ export default function App() {
   const [done,       setDone]       = useState([]);
   const [showBanner, setShowBanner] = useState(false);
   const [mobilesPresent, setMobilesPresent] = useState(false);
+
+  // Consent gate — persists for the session, not across tabs/closes
+  const [consented, setConsented] = useState(() => {
+    try { return sessionStorage.getItem("upi_consent") === "1"; } catch(_) { return false; }
+  });
+
+  const handleConsent = () => {
+    try { sessionStorage.setItem("upi_consent", "1"); } catch(_) {}
+    setConsented(true);
+  };
+
+  // Show consent gate if not yet accepted this session
+  if (!consented) return <ConsentGate onAccept={handleConsent} />;
 
   // On mount: URL config first (PII-free), then localStorage + sessionStorage merge
   useEffect(() => {
