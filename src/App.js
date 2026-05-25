@@ -77,6 +77,9 @@ const MAX_URL_DECODE_ATTEMPTS = 3;
 // DATA MODEL
 // ─────────────────────────────────────────────
 
+// Official BHIM UPI *99# steps page — verified working
+const NPCI_99_URL = "https://www.bhimupi.org.in/steps-to-use-99";
+
 const PSP_DATA = [
   { id: "gpay",      name: "Google Pay",   shortName: "GPay",
     handles: ["@okaxis","@okicici","@oksbi","@okhdfcbank"],
@@ -610,7 +613,7 @@ function ConsentDetail() {
             </div>
           ))}
           <div style={{ borderTop:"1px solid #1e293b", marginTop:10, paddingTop:10, fontSize:12, color:"#475569", lineHeight:1.6 }}>
-            UPI IDs are generated based on standard handle patterns — not by connecting to any bank or NPCI. Always verify via <strong style={{ color:"#94a3b8", fontFamily:"monospace" }}>*99#</strong> before taking action.
+            UPI IDs are generated based on standard handle patterns — not by connecting to any bank or NPCI. Always verify via <a href={NPCI_99_URL} target="_blank" rel="noopener noreferrer" style={{ color:"#38bdf8", textDecoration:"none", borderBottom:"1px solid #38bdf833" }}>*99# (NPCI's official service)</a> before taking action.
           </div>
         </div>
       )}
@@ -641,7 +644,7 @@ function Step0Setup({ onNext, initialSims }) {
 
   return (
     <div>
-      <h2 style={{ fontSize:22, fontWeight:700, color:"#f1f5f9", marginBottom:6 }}>Set up your health check</h2>
+      <h2 style={{ fontSize:22, fontWeight:700, color:"#f1f5f9", marginBottom:6 }}>Set up your UPI ID health check</h2>
       <p style={{ color:"#94a3b8", fontSize:14, marginBottom:16, lineHeight:1.6 }}>
         Add every number you've used for UPI — current and old SIMs. All data stays local.
       </p>
@@ -854,7 +857,7 @@ function Step3ActionPlan({ vpas, onNext, onBack }) {
       <div style={{ background:"#0c1a2e", border:"1px solid #1e3a5f", borderRadius:10, padding:"13px 16px", marginBottom:20 }}>
         <div style={{ fontSize:12, fontWeight:600, color:"#38bdf8", marginBottom:8 }}>⚡ Before you start</div>
         <div style={{ fontSize:13, color:"#64748b", lineHeight:1.7 }}>
-          Dial <strong style={{ color:"#e2e8f0", fontFamily:"monospace" }}>*99#</strong> from each SIM to verify these IDs actually exist before deleting. Takes 2 minutes per SIM. Works without internet on any phone.
+          Dial <a href={NPCI_99_URL} target="_blank" rel="noopener noreferrer" style={{ color:"#e2e8f0", fontFamily:"monospace", textDecoration:"none", borderBottom:"1px solid #e2e8f044" }}>*99#</a> from each SIM to verify these IDs actually exist before deleting. Takes 2 minutes per SIM. Works without internet on any phone.
         </div>
       </div>
 
@@ -1012,15 +1015,15 @@ function Step4Cleanup({ vpas, sims, done, setDone, onBack }) {
         <button onClick={()=>setShowUSSD(!showUSSD)} style={{ width:"100%", padding:"9px 11px", borderRadius:showUSSD?"9px 9px 0 0":9, cursor:"pointer", background:"#0d0d12", border:"1px solid #1e1e28", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <div style={{ display:"flex", alignItems:"center", gap:7 }}>
             <span style={{ fontSize:9, fontWeight:800, color:"#FFD700", background:"#FFD70010", border:"1px solid #FFD70022", borderRadius:4, padding:"1px 5px" }}>*99#</span>
-            <span style={{ fontSize:11, color:"#888", fontWeight:600 }}>USSD Verification Guide</span>
+            <span style={{ fontSize:11, color:"#888", fontWeight:600 }}>USSD Verification — <a href={NPCI_99_URL} target="_blank" rel="noopener noreferrer" style={{ color:"#FFD700", textDecoration:"none", borderBottom:"1px solid #FFD70044" }}>Official NPCI Service ↗</a></span>
           </div>
           <span style={{ color:"#333", fontSize:9 }}>{showUSSD?"▲":"▼"}</span>
         </button>
         {showUSSD && (
           <div style={{ background:"#080810", border:"1px solid #1e1e28", borderTop:"none", borderRadius:"0 0 9px 9px", padding:"11px" }}>
-            <p style={{ fontSize:10, color:"#555", marginBottom:9, lineHeight:1.6 }}>
-              NPCI's USSD service — VPA discovery without internet.
-              <span style={{ color:"#FF9F1C", display:"block", marginTop:2 }}>⚠ Read-only. Cannot delete VPAs.</span>
+            <p style={{ fontSize:11, color:"#555", marginBottom:9, lineHeight:1.6 }}>
+              <a href={NPCI_99_URL} target="_blank" rel="noopener noreferrer" style={{ color:"#FFD700", textDecoration:"none", fontWeight:600 }}>*99#</a> is NPCI's official offline banking service — works on any phone without internet. It's the definitive way to verify which UPI IDs are actually registered to your SIM.
+              <span style={{ color:"#FF9F1C", display:"block", marginTop:4 }}>⚠ Read-only. Cannot delete VPAs — use apps for that.</span>
             </p>
             {USSD_STEPS.map((s,i) => (
               <div key={i} style={{ display:"flex", gap:8, marginBottom:8, alignItems:"flex-start" }}>
@@ -1151,7 +1154,7 @@ function AboutPanel() {
           </div>
 
           <Section icon="⚠️" title="Important disclaimer">
-            UPI IDs shown are generated based on standard handle patterns and may not match your exact account state. Always cross-check by dialling <strong style={{ color:"#e2e8f0" }}>*99#</strong> from your SIM — NPCI's own service — before taking any action. This tool is not affiliated with NPCI, UPI, or any bank or payment service provider. It is a free public utility, built for Indian UPI users.
+            UPI IDs shown are generated based on standard handle patterns and may not match your exact account state. Always cross-check by dialling <a href={NPCI_99_URL} target="_blank" rel="noopener noreferrer" style={{ color:"#38bdf8", textDecoration:"none", borderBottom:"1px solid #38bdf833" }}>*99#</a> from your SIM — NPCI's own official service — before taking any action. This tool is not affiliated with NPCI, UPI, or any bank or payment service provider. It is a free public utility, built for Indian UPI users.
           </Section>
 
           <div style={{ borderTop:"1px solid #334155", paddingTop:14, fontSize:12, color:"#475569", lineHeight:1.9 }}>
