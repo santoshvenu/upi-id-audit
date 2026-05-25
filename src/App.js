@@ -108,14 +108,66 @@ const PSP_DATA = [
 ];
 
 const BANK_DATA = [
-  { id: "hdfc",  name: "HDFC Bank",  handles: ["@hdfcbank","@payzapp"],  color: "#004C8F",
+  { id: "hdfc",      name: "HDFC Bank",         handles: ["@hdfcbank","@payzapp"],        color: "#004C8F",
     cleanupSteps: ["Log in to HDFC NetBanking","Go to 'Pay' → 'UPI' → 'Manage UPI IDs'","Select the VPA and choose 'Deregister'","Or visit branch — submit UPI Deactivation Request form"] },
-  { id: "icici", name: "ICICI Bank", handles: ["@icici","@icicinrbin"],   color: "#F58220",
+  { id: "icici",     name: "ICICI Bank",         handles: ["@icici","@icicinrbin"],        color: "#F58220",
     cleanupSteps: ["Open iMobile Pay app","Go to Profile → 'Manage UPI IDs'","Select the VPA to deactivate","Tap 'Deactivate' and confirm"] },
-  { id: "sbi",   name: "SBI",        handles: ["@sbi","@sbipay"],         color: "#2980B9",
+  { id: "sbi",       name: "SBI",                handles: ["@sbi","@sbipay"],              color: "#2980B9",
     cleanupSteps: ["Open YONO SBI app","Go to 'UPI' → 'Manage VPA'","Select the UPI ID to delete","Confirm deletion with OTP"] },
-  { id: "axis",  name: "Axis Bank",  handles: ["@axisbank","@axis"],      color: "#97144D",
+  { id: "axis",      name: "Axis Bank",          handles: ["@axisbank","@axis"],           color: "#97144D",
     cleanupSteps: ["Open Axis Mobile app","Go to 'UPI' → 'Registered VPAs'","Select the VPA and tap 'Remove'","Authenticate with your UPI PIN to confirm"] },
+  { id: "kotak",     name: "Kotak Mahindra Bank",handles: ["@kotak","@kmbl"],              color: "#EF4444",
+    cleanupSteps: ["Open Kotak Mobile Banking app","Go to UPI → Manage UPI IDs","Select the VPA and deregister","Confirm with your UPI PIN"] },
+  { id: "pnb",       name: "Punjab National Bank",handles: ["@pnb"],                       color: "#7C3AED",
+    cleanupSteps: ["Open PNB ONE app","Navigate to UPI section → Manage VPA","Select and delete the UPI ID","Contact PNB branch if self-service unavailable"] },
+  { id: "bob",       name: "Bank of Baroda",     handles: ["@barodampay","@bob"],          color: "#F97316",
+    cleanupSteps: ["Open BOB World app","Go to UPI → Registered VPAs","Select the VPA to remove","Confirm with UPI PIN"] },
+  { id: "canara",    name: "Canara Bank",        handles: ["@cnrb"],                       color: "#059669",
+    cleanupSteps: ["Open Canara ai1 app","Go to UPI Settings → Manage UPI IDs","Select and deregister the VPA","Confirm with OTP"] },
+  { id: "idfc",      name: "IDFC FIRST Bank",    handles: ["@idfcbank","@idfcfirst"],      color: "#0EA5E9",
+    cleanupSteps: ["Open IDFC FIRST Bank app","Go to UPI → My UPI IDs","Select the ID and tap Remove","Authenticate with UPI PIN"] },
+  { id: "yesbank",   name: "Yes Bank",           handles: ["@yesbank","@ybl"],             color: "#1D4ED8",
+    cleanupSteps: ["Open Yes Bank app","Navigate to UPI → Manage UPI IDs","Select the VPA to deactivate","Confirm with your PIN"] },
+  { id: "indusind",  name: "IndusInd Bank",      handles: ["@indus"],                      color: "#DC2626",
+    cleanupSteps: ["Open IndusMobile app","Go to UPI → Registered VPAs","Select and remove the VPA","Authenticate to confirm"] },
+  { id: "federal",   name: "Federal Bank",       handles: ["@fbl"],                        color: "#0369A1",
+    cleanupSteps: ["Open FedMobile app","Navigate to UPI section → Manage VPAs","Select the ID to remove","Confirm with UPI PIN"] },
+  { id: "union",     name: "Union Bank of India",handles: ["@unionbank","@uboi"],          color: "#7C2D12",
+    cleanupSteps: ["Open Union Bank Mobile Banking","Go to UPI → UPI Profile","Manage and delete registered VPAs","Contact branch if needed"] },
+  { id: "iob",       name: "Indian Overseas Bank",handles: ["@iob"],                      color: "#166534",
+    cleanupSteps: ["Open IOB Mobile app","Go to UPI Services → Manage UPI IDs","Select and deregister","Confirm with OTP"] },
+  { id: "boi",       name: "Bank of India",      handles: ["@boi"],                        color: "#1E3A8A",
+    cleanupSteps: ["Open BOI Mobile app","Navigate to UPI → UPI IDs","Select the VPA to remove","Confirm with PIN"] },
+  { id: "central",   name: "Central Bank of India",handles: ["@centralbank"],             color: "#991B1B",
+    cleanupSteps: ["Open Cent Mobile app","Go to UPI section → Manage VPAs","Select and delete the UPI ID","Contact branch if self-service unavailable"] },
+  { id: "uco",       name: "UCO Bank",           handles: ["@uco"],                        color: "#1F2937",
+    cleanupSteps: ["Open UCO mPassbook app","Navigate to UPI → Registered IDs","Select the VPA to deregister","Confirm with OTP"] },
+  { id: "indian",    name: "Indian Bank",        handles: ["@indianbank"],                 color: "#78350F",
+    cleanupSteps: ["Open IndOASIS app","Go to UPI → Manage UPI IDs","Select and remove the VPA","Authenticate to confirm"] },
+  { id: "bandhan",   name: "Bandhan Bank",       handles: ["@bandhan"],                    color: "#065F46",
+    cleanupSteps: ["Open Bandhan Bank app","Navigate to UPI Services","Manage and remove registered VPAs","Contact branch for assistance"] },
+  { id: "rbl",       name: "RBL Bank",           handles: ["@rbl"],                        color: "#92400E",
+    cleanupSteps: ["Open RBL MoBank app","Go to UPI → UPI IDs","Select the VPA to remove","Confirm with UPI PIN"] },
+  { id: "csb",       name: "CSB Bank",           handles: ["@csb"],                        color: "#1C1917",
+    cleanupSteps: ["Open CSB Bank app","Navigate to UPI section","Manage and deregister VPAs","Contact branch if needed"] },
+  { id: "karnataka", name: "Karnataka Bank",     handles: ["@karnataka"],                  color: "#1E40AF",
+    cleanupSteps: ["Open KBL Mobile app","Go to UPI → Manage UPI IDs","Select and remove the VPA","Authenticate to confirm"] },
+  { id: "south",     name: "South Indian Bank",  handles: ["@sib"],                        color: "#065F46",
+    cleanupSteps: ["Open SIB Mirror+ app","Navigate to UPI → Registered VPAs","Select and deactivate","Confirm with PIN"] },
+  { id: "dcb",       name: "DCB Bank",           handles: ["@dcb"],                        color: "#4338CA",
+    cleanupSteps: ["Open DCB Bank app","Go to UPI section → Manage IDs","Select the VPA to remove","Contact branch for assistance"] },
+  { id: "nainital",  name: "Nainital Bank",      handles: ["@nainital"],                   color: "#0F766E",
+    cleanupSteps: ["Contact Nainital Bank branch directly","Request UPI ID deregistration","Submit written request if needed"] },
+  { id: "tjsb",      name: "TJSB Sahakari Bank", handles: ["@tjsb"],                       color: "#7C3AED",
+    cleanupSteps: ["Contact TJSB branch directly","Request UPI ID deregistration","Submit written application"] },
+  { id: "saraswat",  name: "Saraswat Bank",      handles: ["@saraswat"],                   color: "#0369A1",
+    cleanupSteps: ["Open Saraswat Bank app","Go to UPI section","Manage and remove registered VPAs","Contact branch if needed"] },
+  { id: "airtel",    name: "Airtel Payments Bank",handles: ["@airtel"],                    color: "#DC2626",
+    cleanupSteps: ["Open Airtel Thanks app","Go to Payments Bank → UPI","Manage and remove UPI IDs","Contact Airtel support if needed"] },
+  { id: "paytmbank", name: "Paytm Payments Bank",handles: ["@paytm"],                     color: "#00BAF2",
+    cleanupSteps: ["Open Paytm app","Go to Payment Settings → UPI","Select and remove the UPI ID","Confirm with Paytm PIN"] },
+  { id: "fino",      name: "Fino Payments Bank", handles: ["@fino"],                       color: "#92400E",
+    cleanupSteps: ["Open Fino BPay app","Navigate to UPI section","Manage and deregister VPAs","Contact Fino support if needed"] },
 ];
 
 const USSD_STEPS = [
@@ -520,75 +572,89 @@ function SIMCard({ sim, index, onChange, onRemove, canRemove }) {
         </div>
       </div>
       <label style={ls}>UPI apps used on this number</label>
-      <div style={{ display:"flex", flexWrap:"wrap", gap:5, marginBottom:9 }}>
+      <div style={{ display:"flex", flexWrap:"wrap", gap:5, marginBottom:12 }}>
         {PSP_DATA.map(app => { const sel = sim.selectedApps.includes(app.id); return (
           <button key={app.id} onClick={()=>toggle(app.id,"selectedApps")} style={{ padding:"4px 9px", borderRadius:6, cursor:"pointer", fontSize:10, fontWeight:600, border:sel?`1.5px solid ${app.color}`:"1.5px solid #252525", background:sel?`${app.color}18`:"#0d0d0d", color:sel?app.color:"#444", transition:"all 0.15s" }}>{app.shortName}</button>
         );})}
       </div>
+
       <label style={ls}>Banks linked on this number</label>
-      <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
-        {BANK_DATA.map(bank => { const sel = sim.selectedBanks.includes(bank.id); return (
-          <button key={bank.id} onClick={()=>toggle(bank.id,"selectedBanks")} style={{ padding:"4px 9px", borderRadius:6, cursor:"pointer", fontSize:10, fontWeight:600, border:sel?`1.5px solid ${bank.color}`:"1.5px solid #252525", background:sel?`${bank.color}18`:"#0d0d0d", color:sel?bank.color:"#444", transition:"all 0.15s" }}>{bank.name}</button>
-        );})}
-      </div>
+      <BankSearchSelect selected={sim.selectedBanks} onChange={ids => onChange({...sim, selectedBanks: ids})} />
     </div>
   );
 }
 
-// ─────────────────────────────────────────────
-// SHARE MODAL  (URL is PII-free; text summary masks numbers)
-// ─────────────────────────────────────────────
+// Searchable multi-select for banks
+function BankSearchSelect({ selected, onChange }) {
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
 
-function ShareModal({ sims, vpas, done, onClose }) {
-  const [copied, setCopied] = useState(null);
-  const shareURL  = encodeConfigToURL(sims);
-  const shareText = buildTextSummary(sims, vpas, done);
-  const copy = async (text, key) => {
-    try { await navigator.clipboard.writeText(text); setCopied(key); setTimeout(()=>setCopied(null), 2200); } catch(_) {}
+  const filtered = BANK_DATA.filter(b =>
+    b.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  const toggle = (id) => {
+    onChange(selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id]);
   };
+
+  const selectedBanks = BANK_DATA.filter(b => selected.includes(b.id));
+
   return (
-    <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1000, padding:16 }} onClick={onClose}>
-      <div style={{ background:"#0c0c16", border:"1px solid #252535", borderRadius:14, padding:"22px 20px", width:"100%", maxWidth:440 }} onClick={e=>e.stopPropagation()}>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
-          <span style={{ fontSize:13, fontWeight:800, color:"#ddd" }}>Share / Export</span>
-          <button onClick={onClose} style={{ background:"none", border:"none", color:"#555", cursor:"pointer", fontSize:18, lineHeight:1 }}>×</button>
+    <div style={{ position:"relative", marginBottom:4 }}>
+      {/* Selected tags */}
+      {selectedBanks.length > 0 && (
+        <div style={{ display:"flex", flexWrap:"wrap", gap:5, marginBottom:8 }}>
+          {selectedBanks.map(b => (
+            <span key={b.id} style={{ display:"flex", alignItems:"center", gap:4, padding:"3px 8px", borderRadius:6, fontSize:11, background:`${b.color}18`, border:`1px solid ${b.color}44`, color:b.color }}>
+              {b.name}
+              <span onClick={() => toggle(b.id)} style={{ cursor:"pointer", fontSize:12, lineHeight:1, color:b.color, fontWeight:700 }}>×</span>
+            </span>
+          ))}
         </div>
+      )}
 
-        {/* URL share — no PII */}
-        <div style={{ marginBottom:14 }}>
-          <div style={{ fontSize:9, fontWeight:700, color:"#2EC4B6", letterSpacing:1, textTransform:"uppercase", marginBottom:5 }}>
-            🔒 Share Link — No personal data in URL
-          </div>
-          <div style={{ fontSize:9, color:"#555", marginBottom:8, lineHeight:1.5 }}>
-            Shares your app selections and settings only. Mobile numbers are <strong style={{color:"#888"}}>not included</strong>. Recipient enters their own number.
-          </div>
-          <div style={{ background:"#0d0d12", border:"1px solid #1e1e1e", borderRadius:8, padding:"8px 10px", marginBottom:7, wordBreak:"break-all", fontSize:9, color:"#444", fontFamily:"monospace", maxHeight:48, overflow:"hidden" }}>
-            {shareURL ? shareURL.slice(0, 100)+"…" : "unavailable"}
-          </div>
-          <button onClick={()=>copy(shareURL,"url")} style={{ ...bp, fontSize:11, padding:"8px" }}>
-            {copied==="url" ? "✓ Copied!" : "Copy Share Link"}
-          </button>
-        </div>
-
-        <div style={{ height:1, background:"#181820", margin:"14px 0" }} />
-
-        {/* Text summary — masked numbers */}
-        <div>
-          <div style={{ fontSize:9, fontWeight:700, color:"#555", letterSpacing:1, textTransform:"uppercase", marginBottom:5 }}>
-            Text Summary — Numbers masked to last 4 digits
-          </div>
-          <pre style={{ background:"#0d0d12", border:"1px solid #1e1e1e", borderRadius:8, padding:"8px 10px", marginBottom:7, fontSize:9, color:"#666", fontFamily:"monospace", overflowX:"auto", whiteSpace:"pre-wrap", maxHeight:130, overflowY:"auto", lineHeight:1.5 }}>
-            {shareText}
-          </pre>
-          <button onClick={()=>copy(shareText,"text")} style={{ ...bp, fontSize:11, padding:"8px", background:"#1a1a28", color:"#aaa" }}>
-            {copied==="text" ? "✓ Copied!" : "Copy Text Summary"}
-          </button>
-        </div>
+      {/* Search input */}
+      <div style={{ position:"relative" }}>
+        <input
+          value={query}
+          onChange={e => { setQuery(e.target.value); setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          placeholder={selected.length === 0 ? "Search and select banks..." : "Add another bank..."}
+          style={{ ...is, paddingRight:32 }}
+        />
+        {query && (
+          <span onClick={() => { setQuery(""); setOpen(false); }} style={{ position:"absolute", right:10, top:"50%", transform:"translateY(-50%)", cursor:"pointer", color:"#64748b", fontSize:16 }}>×</span>
+        )}
       </div>
+
+      {/* Dropdown */}
+      {open && (
+        <div style={{ position:"absolute", top:"100%", left:0, right:0, background:"#1e293b", border:"1px solid #334155", borderRadius:8, maxHeight:200, overflowY:"auto", zIndex:100, marginTop:2, boxShadow:"0 8px 24px rgba(0,0,0,0.4)" }}
+          onMouseDown={e => e.preventDefault()}>
+          {filtered.length === 0 ? (
+            <div style={{ padding:"10px 12px", fontSize:12, color:"#64748b" }}>No banks found</div>
+          ) : (
+            filtered.map(b => {
+              const sel = selected.includes(b.id);
+              return (
+                <div key={b.id} onClick={() => { toggle(b.id); setQuery(""); }}
+                  style={{ display:"flex", alignItems:"center", gap:10, padding:"9px 12px", cursor:"pointer", background: sel ? "#0f172a" : "transparent", borderBottom:"1px solid #1e293b" }}>
+                  <div style={{ width:14, height:14, borderRadius:3, border:`2px solid ${sel ? "#22c55e" : "#475569"}`, background: sel ? "#22c55e" : "transparent", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    {sel && <span style={{ color:"#fff", fontSize:9, fontWeight:700 }}>✓</span>}
+                  </div>
+                  <span style={{ fontSize:13, color: sel ? "#e2e8f0" : "#94a3b8" }}>{b.name}</span>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+      {open && <div style={{ position:"fixed", inset:0, zIndex:99 }} onClick={() => setOpen(false)} />}
     </div>
   );
 }
 
+// ─────────────────────────────────────────────
 function ConsentDetail() {
   const [open, setOpen] = useState(false);
   return (
@@ -800,10 +866,46 @@ function Step2Risk({ vpas, onNext, onBack }) {
 // STEP 3 — ACTION PLAN
 // ─────────────────────────────────────────────
 
-function Step3ActionPlan({ vpas, onNext, onBack }) {
+function Step3ActionPlan({ vpas, sims, onNext, onBack }) {
   const high   = vpas.filter(v => v.risk.level === "HIGH");
   const medium = vpas.filter(v => v.risk.level === "MEDIUM");
   const low    = vpas.filter(v => v.risk.level === "LOW");
+
+  // Build scenario-based guidance from what user told us
+  const scenarios = [];
+  sims.forEach(s => {
+    const label = s.label || "your number";
+    if (s.phoneStatus === "changed") {
+      scenarios.push({
+        icon: "📵",
+        color: "#ef4444",
+        title: `You surrendered / changed ${label}`,
+        guidance: "This is the highest priority scenario. Your old UPI IDs are still active but the number may now belong to someone else. You need to delete every UPI ID linked to this number immediately — contact each bank and app directly. If you no longer have access to the SIM, visit your bank branch with ID proof and request UPI deregistration."
+      });
+    } else if (s.phoneStatus === "inactive") {
+      scenarios.push({
+        icon: "📴",
+        color: "#f59e0b",
+        title: `${label} is inactive`,
+        guidance: "Your UPI IDs are still live but the number isn't in use. Reinsert the SIM, dial *99# to verify which IDs exist, then delete them via each app while you still have access. Don't wait — inactive numbers get reassigned by telecoms."
+      });
+    }
+    if (s.bankStatus === "closed") {
+      scenarios.push({
+        icon: "🏦",
+        color: "#ef4444",
+        title: "Bank account closed",
+        guidance: "UPI IDs linked to closed accounts don't auto-deactivate. Contact your bank branch with your account details and request formal UPI ID deregistration. Also delete the IDs from each app — both steps are needed."
+      });
+    } else if (s.bankStatus === "dormant") {
+      scenarios.push({
+        icon: "💤",
+        color: "#f59e0b",
+        title: "Bank account dormant",
+        guidance: "Your account is still technically open but inactive. Reactivate it at a branch, then use the bank's app to manage and remove unwanted UPI IDs."
+      });
+    }
+  });
 
   // Group by app for batching advice
   const byApp = vpas.reduce((acc, v) => {
@@ -852,6 +954,24 @@ function Step3ActionPlan({ vpas, onNext, onBack }) {
         {urgencyLabel}
         {estMins > 0 && <span style={{ color:"#64748b" }}> · ~{estMins} min total</span>}
       </p>
+
+      {/* Scenario-based guidance */}
+      {scenarios.length > 0 && (
+        <div style={{ marginBottom:20 }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#94a3b8", letterSpacing:0.8, textTransform:"uppercase", marginBottom:10 }}>
+            🎯 Your specific situation — what to do
+          </div>
+          {scenarios.map((sc, i) => (
+            <div key={i} style={{ background:"#0f172a", border:`1px solid ${sc.color}33`, borderLeft:`3px solid ${sc.color}`, borderRadius:10, padding:"13px 15px", marginBottom:10 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:7 }}>
+                <span style={{ fontSize:16 }}>{sc.icon}</span>
+                <span style={{ fontSize:13, fontWeight:600, color:"#f1f5f9" }}>{sc.title}</span>
+              </div>
+              <div style={{ fontSize:13, color:"#94a3b8", lineHeight:1.7 }}>{sc.guidance}</div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Before you start */}
       <div style={{ background:"#0c1a2e", border:"1px solid #1e3a5f", borderRadius:10, padding:"13px 16px", marginBottom:20 }}>
@@ -936,7 +1056,6 @@ function Step4Cleanup({ vpas, sims, done, setDone, onBack }) {
   const [expanded,   setExpanded]   = useState(null);
   const [showUSSD,   setShowUSSD]   = useState(false);
   const [reminderOK, setReminderOK] = useState(false);
-  const [showShare,  setShowShare]  = useState(false);
 
   const sorted = [...vpas].sort((a,b)=>b.risk.score-a.risk.score);
   const toggleDone = vpa => setDone(d => d.includes(vpa) ? d.filter(x=>x!==vpa) : [...d,vpa]);
@@ -944,7 +1063,7 @@ function Step4Cleanup({ vpas, sims, done, setDone, onBack }) {
 
   return (
     <div>
-      {showShare && <ShareModal sims={sims} vpas={vpas} done={done} onClose={()=>setShowShare(false)} />}
+      {showUSSD && <div style={{ position:"fixed", inset:0, zIndex:98 }} onClick={()=>setShowUSSD(false)} />}
 
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:4 }}>
         <div>
@@ -953,7 +1072,6 @@ function Step4Cleanup({ vpas, sims, done, setDone, onBack }) {
         </div>
         <div style={{ display:"flex", gap:5 }}>
           <button onClick={()=>exportToPDF(vpas,sims)} style={{ padding:"5px 8px", borderRadius:6, fontSize:9, fontWeight:700, border:"1px solid #252525", background:"#0d0d12", color:"#777", cursor:"pointer" }}>↓ PDF</button>
-          <button onClick={()=>setShowShare(true)} style={{ padding:"5px 8px", borderRadius:6, fontSize:9, fontWeight:700, border:"1px solid #252525", background:"#0d0d12", color:"#777", cursor:"pointer" }}>⬆ Share</button>
           <button onClick={()=>{downloadICS();setReminderOK(true);}} style={{ padding:"5px 8px", borderRadius:6, fontSize:9, fontWeight:700, border:`1px solid ${reminderOK?"#2EC4B644":"#252525"}`, background:reminderOK?"#2EC4B610":"#0d0d12", color:reminderOK?"#2EC4B6":"#777", cursor:"pointer" }}>
             {reminderOK?"✓":"⏱"}
           </button>
@@ -1039,12 +1157,11 @@ function Step4Cleanup({ vpas, sims, done, setDone, onBack }) {
       </div>
 
       <div style={{ background:"#0d0d12", border:"1px solid #181818", borderRadius:10, padding:"11px", marginBottom:12 }}>
-        <div style={{ fontSize:8, fontWeight:700, color:"#333", letterSpacing:1.2, textTransform:"uppercase", marginBottom:8 }}>Export & Share</div>
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:6 }}>
-          <button onClick={()=>exportToPDF(vpas,sims)} style={{ padding:"8px 4px", borderRadius:7, fontSize:9, fontWeight:700, border:"1px solid #222", background:"#111", color:"#888", cursor:"pointer" }}>↓ PDF</button>
-          <button onClick={()=>setShowShare(true)} style={{ padding:"8px 4px", borderRadius:7, fontSize:9, fontWeight:700, border:"1px solid #222", background:"#111", color:"#888", cursor:"pointer" }}>⬆ Share</button>
+        <div style={{ fontSize:8, fontWeight:700, color:"#333", letterSpacing:1.2, textTransform:"uppercase", marginBottom:8 }}>Export & Remind</div>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
+          <button onClick={()=>exportToPDF(vpas,sims)} style={{ padding:"8px 4px", borderRadius:7, fontSize:9, fontWeight:700, border:"1px solid #222", background:"#111", color:"#888", cursor:"pointer" }}>↓ Export PDF</button>
           <button onClick={()=>{downloadICS();setReminderOK(true);}} style={{ padding:"8px 4px", borderRadius:7, fontSize:9, fontWeight:700, border:`1px solid ${reminderOK?"#2EC4B640":"#222"}`, background:reminderOK?"#2EC4B610":"#111", color:reminderOK?"#2EC4B6":"#888", cursor:"pointer" }}>
-            {reminderOK?"✓ Set":"⏱ Remind"}
+            {reminderOK?"✓ Reminder set":"⏱ 6-Month Reminder"}
           </button>
         </div>
       </div>
@@ -1277,7 +1394,7 @@ export default function App() {
           {step === 0 && <Step0Setup onNext={handleSetup} initialSims={sims} />}
           {step === 1 && <Step1VPAs sims={sims} vpas={vpas} onNext={()=>setStep(2)} onBack={()=>setStep(0)} />}
           {step === 2 && <Step2Risk vpas={vpas} onNext={()=>setStep(3)} onBack={()=>setStep(1)} />}
-          {step === 3 && <Step3ActionPlan vpas={vpas} onNext={()=>setStep(4)} onBack={()=>setStep(2)} />}
+          {step === 3 && <Step3ActionPlan vpas={vpas} sims={sims} onNext={()=>setStep(4)} onBack={()=>setStep(2)} />}
           {step === 4 && <Step4Cleanup vpas={vpas} sims={sims} done={done} setDone={setDone} onBack={()=>setStep(3)} />}
         </div>
 
